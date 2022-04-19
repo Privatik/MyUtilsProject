@@ -1,26 +1,28 @@
 package com.io.myutilsproject
 
-import androidx.compose.runtime.Composable
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import com.io.navigation.RootControllerWithPresenterBuilder
+import com.io.navigation.screen
+import ru.alexgladkov.odyssey.compose.extensions.push
+import ru.alexgladkov.odyssey.compose.local.LocalRootController
 
-@Composable
-fun NavigationHost(){
-    val controller = rememberNavController()
 
-    NavHost(
-        navController = controller,
-        startDestination = Screens.FirstScreen.route){
+fun RootControllerWithPresenterBuilder<Presenter>.generateGraph() {
 
-        controller.popBackStack()
-        composable(Screens.FirstScreen.route){
-
+    screen(
+        name = Screens.FirstScreen.route,
+        presenter = FirstPresenter::class
+    ) {
+        val controller = LocalRootController.current
+        FirstScreen{
+            controller.push(Screens.SecondScreen.route)
         }
+    }
 
-        composable(Screens.SecondScreen.route){
-
-        }
+    screen(
+        name = Screens.SecondScreen.route,
+        presenter = SecondPresenter::class
+    ) {
+        SecondScreen()
     }
 }
 

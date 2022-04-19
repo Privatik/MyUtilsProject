@@ -3,36 +3,43 @@ package com.io.myutilsproject
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
-import com.io.myutilsproject.ui.theme.MyUtilsProjectTheme
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import ru.alexgladkov.odyssey.compose.base.Navigator
+import ru.alexgladkov.odyssey.compose.extensions.setupWithActivity
+import ru.alexgladkov.odyssey.compose.local.LocalRootController
+import ru.alexgladkov.odyssey.compose.navigation.RootComposeBuilder
+import ru.alexgladkov.odyssey.compose.navigation.modal_navigation.ModalNavigator
+import ru.alexgladkov.odyssey.compose.setupNavigation
+import timber.log.Timber
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        setupNavigation(Screens.FirstScreen.route){
+            generateGraph()
+        }
+
+        val rootController = RootComposeBuilder().apply { generateGraph() }.build()
+        rootController.setupWithActivity(this)
+
         setContent {
-            MyUtilsProjectTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(color = MaterialTheme.colors.background) {
-                    Greeting("Android")
+            CompositionLocalProvider(
+                LocalRootController provides rootController
+            ) {
+                val currentScreen = LocalRootController.current
+                LaunchedEffect(Unit){
+                    currentScreen.currentScreen.collect{
+                        Timber.d("CurrentScreen ${it.screen.key}")
+                    }
+                }
+
+                ModalNavigator {
+                    Navigator(Screens.FirstScreen.route)
                 }
             }
         }
-    }
-}
 
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    MyUtilsProjectTheme {
-        Greeting("Android")
     }
 }
