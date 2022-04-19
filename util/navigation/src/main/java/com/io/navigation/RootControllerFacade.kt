@@ -15,7 +15,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
 
 class RootControllerFacade<Presenter: Any>(
-    val controller: RootController,
+    private val controller: RootController,
     private val _presenterStore: HashMap<String, KClass<out Presenter>>
 ) {
     private val store = HashMap<String, Presenter>()

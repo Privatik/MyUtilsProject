@@ -1,12 +1,23 @@
 package com.io.navigation
 
 import ru.alexgladkov.odyssey.compose.RenderWithParams
+import ru.alexgladkov.odyssey.compose.RootController
 import ru.alexgladkov.odyssey.compose.helpers.FlowBuilder
 import ru.alexgladkov.odyssey.compose.navigation.bottom_bar_navigation.BottomNavConfiguration
 import ru.alexgladkov.odyssey.compose.navigation.bottom_bar_navigation.MultiStackBuilder
 import ru.alexgladkov.odyssey.compose.navigation.bottom_bar_navigation.TabsNavModel
 import ru.alexgladkov.odyssey.compose.navigation.bottom_bar_navigation.TopNavConfiguration
+import ru.alexgladkov.odyssey.core.LaunchFlag
+import ru.alexgladkov.odyssey.core.animations.defaultPushAnimation
 import kotlin.reflect.KClass
+
+fun <Presenter: Any> RootControllerFacade<Presenter>.push(screen: String, params: Any? = null, launchFlag: LaunchFlag? = null) {
+    launch(screen = screen, startScreen = null, startTabPosition = 0, params = params, animationType = defaultPushAnimation(), launchFlag)
+}
+
+fun <Presenter: Any> RootControllerFacade<Presenter>.push(screen: String, params: Any? = null) {
+    launch(screen = screen, params = params, animationType = defaultPushAnimation())
+}
 
 fun <Presenter: Any> RootControllerWithPresenterBuilder<Presenter>.screen(
     name: String,

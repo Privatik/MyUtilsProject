@@ -14,6 +14,7 @@ import ru.alexgladkov.odyssey.core.backpress.OnBackPressedDispatcher
 
 fun <Presenter: Any> ComponentActivity.createGraph(
     startScreen: String,
+    factoryForPresenter: PresenterFactory<Presenter>,
     vararg providers: ProvidedValue<*>,
     navigationGraph: RootComposeBuilder.() -> Unit
 ){
@@ -27,7 +28,7 @@ fun <Presenter: Any> ComponentActivity.createGraph(
     setContent {
         CompositionLocalProvider(
             *providers,
-            LocalRootController provides rootController.controller
+            LocalRootFacadeController provides rootController
         ) {
             LaunchedEffect(Unit){
                 rootController.currentScreen.collect{
