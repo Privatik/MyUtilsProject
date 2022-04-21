@@ -1,4 +1,6 @@
 package com.io.myutilsproject
 
-class FirstPresenter: Presenter() {
+import javax.inject.Inject
+
+class FirstPresenter @Inject constructor(): Presenter() {
 }
