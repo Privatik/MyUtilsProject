@@ -1,10 +1,16 @@
 package com.io.myutilsproject
 
 import com.io.navigation.PresenterFactory
-import kotlin.reflect.KClass
+import javax.inject.Inject
+import javax.inject.Provider
 
-class MyPresenterFactory(
-    _presenterStore: HashMap<String, KClass<out Presenter>>
-): PresenterFactory<Presenter>(_presenterStore) {
+class MyPresenterFactory @Inject constructor(
+    private val presenterFactories: Map<Class<out Presenter>, @JvmSuppressWildcards Provider<Presenter>>
+): PresenterFactory<Presenter> {
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <P : Presenter> create(model: Class<P>): Presenter {
+        return  presenterFactories.getValue(model as Class<Presenter>).get() as P
+    }
 
 }
