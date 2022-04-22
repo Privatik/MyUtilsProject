@@ -1,6 +1,6 @@
 package com.io.navigation
 
-interface PresenterFactory<Presenter: com.io.navigation.Presenter>{
+interface PresenterFactory{
 
-    fun <P: Presenter> create(model: Class<P>): Presenter
+    fun <P: UIPresenter> create(model: Class<P>): P
 }
