@@ -1,5 +1,6 @@
 package com.io.myutilsproject
 
+import com.io.navigation.UIPresenter
 import dagger.Binds
 import dagger.Component
 import dagger.MapKey
@@ -35,4 +36,4 @@ interface AppModule{
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
 @MapKey
-annotation class PresenterKey(val value: KClass<out Presenter>)
+annotation class PresenterKey(val value: KClass<out UIPresenter>)

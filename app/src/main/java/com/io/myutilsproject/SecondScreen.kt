@@ -10,13 +10,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import com.io.navigation.presenter
 
 @Composable
 fun SecondScreen(
     presenter: SecondPresenter
 ){
-    val pr = presenter<SecondPresenter>()
     val state = presenter.count.collectAsState()
     val currentConfig = LocalConfiguration.current
     Box(

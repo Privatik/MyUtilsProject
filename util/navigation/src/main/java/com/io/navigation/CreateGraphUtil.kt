@@ -7,14 +7,13 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ProvidedValue
 import ru.alexgladkov.odyssey.compose.base.Navigator
-import ru.alexgladkov.odyssey.compose.local.LocalRootController
 import ru.alexgladkov.odyssey.compose.navigation.RootComposeBuilder
 import ru.alexgladkov.odyssey.compose.navigation.modal_navigation.ModalNavigator
 import ru.alexgladkov.odyssey.core.backpress.OnBackPressedDispatcher
 
-fun <Presenter: Any> ComponentActivity.createGraph(
+fun <Presenter: UIPresenter> ComponentActivity.createGraph(
     startScreen: String,
-    factoryForPresenter: PresenterFactory<Presenter>,
+//    factoryForPresenter: PresenterFactory<Presenter>,
     vararg providers: ProvidedValue<*>,
     navigationGraph: RootComposeBuilder.() -> Unit
 ){
