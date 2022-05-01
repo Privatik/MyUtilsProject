@@ -5,7 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import com.io.navigation.LocalPresenterFactory
 import ru.alexgladkov.odyssey.compose.base.Navigator
 import ru.alexgladkov.odyssey.compose.extensions.setupWithActivity
 import ru.alexgladkov.odyssey.compose.local.LocalRootController
@@ -28,7 +27,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             CompositionLocalProvider(
                 LocalRootController provides rootController,
-                LocalPresenterFactory provides (applicationContext as App).appComponent.factory
+//                LocalPresenterFactory provides (applicationContext as App).appComponent.factory
             ) {
                 val currentScreen = LocalRootController.current
                 LaunchedEffect(Unit){

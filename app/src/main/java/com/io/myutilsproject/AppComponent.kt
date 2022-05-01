@@ -1,5 +1,6 @@
 package com.io.myutilsproject
 
+import androidx.lifecycle.ViewModel
 import com.io.navigation.UIPresenter
 import dagger.Binds
 import dagger.Component
@@ -34,6 +35,6 @@ interface AppModule{
 }
 
 @Target(AnnotationTarget.FUNCTION)
-@Retention(AnnotationRetention.RUNTIME)
+@kotlin.annotation.Retention(AnnotationRetention.RUNTIME)
 @MapKey
-annotation class PresenterKey(val value: KClass<out UIPresenter>)
+annotation class PresenterKey(val value: KClass<out Presenter>)

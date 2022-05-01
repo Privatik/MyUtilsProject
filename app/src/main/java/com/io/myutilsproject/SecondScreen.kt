@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 fun SecondScreen(
     presenter: SecondPresenter
 ){
+//    val l = com.io.navigation.presenter<SecondPresenter>()
     val state = presenter.count.collectAsState()
     val currentConfig = LocalConfiguration.current
     Box(

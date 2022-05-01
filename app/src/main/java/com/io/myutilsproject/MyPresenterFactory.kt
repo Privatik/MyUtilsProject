@@ -10,8 +10,8 @@ class MyPresenterFactory @Inject constructor(
 ): PresenterFactory {
 
     @Suppress("UNCHECKED_CAST")
-    override fun <P : UIPresenter> create(model: Class<P>): P {
-        return presenterFactories.getValue(model as Class<Presenter>).get() as P
+    override fun <P : UIPresenter> create(model: Class<out UIPresenter>): P {
+         return presenterFactories.getValue(model as Class<out Presenter>).get() as P
     }
 
 }
