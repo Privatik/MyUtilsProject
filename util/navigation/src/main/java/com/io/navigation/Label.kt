@@ -1,3 +1,5 @@
 package com.io.navigation
 
-interface UIPresenter
+interface UIPresenter{
+    fun clear()
+}

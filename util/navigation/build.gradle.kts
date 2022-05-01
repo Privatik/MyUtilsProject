@@ -1,3 +1,4 @@
+
 plugins{
     id("kotlin-android")
     id("com.android.library")
@@ -11,18 +12,12 @@ android {
         targetSdk = 31
     }
 
-    buildTypes {
-        getByName("debug") {
-            isMinifyEnabled = false
-        }
-        getByName("release") {
-            isMinifyEnabled = false
-        }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.1.1"
     }
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+    buildFeatures {
+        compose = true
     }
 }
 
