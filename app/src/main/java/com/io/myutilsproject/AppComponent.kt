@@ -1,24 +1,42 @@
 package com.io.myutilsproject
 
-import androidx.lifecycle.ViewModel
-import com.io.navigation.UIPresenter
-import dagger.Binds
-import dagger.Component
-import dagger.MapKey
-import dagger.Module
+import com.io.navigation.PresenterFactory
+import dagger.*
 import dagger.multibindings.IntoMap
+import javax.inject.Scope
 import javax.inject.Singleton
 import kotlin.reflect.KClass
 
 @Component(modules = [AppModule::class])
 @Singleton
-interface AppComponent {
+interface AppComponent: PresenterDeps {
+    override val factory: MyPresenterFactory
+
+    @Component.Builder
+    interface Builder {
+
+        @BindsInstance
+        fun factory(app: PresenterFactory): Builder
+
+        fun build(): AppComponent
+    }
+}
+
+interface PresenterDeps{
+    val factory: PresenterFactory
+}
+
+@Component(modules = [NextModule::class])
+@NextScope
+interface NextComponent {
     val factory: MyPresenterFactory
 
     @Component.Builder
     interface Builder {
 
-        fun build(): AppComponent
+        fun deps(deps: PresenterDeps): Builder
+
+        fun build(): NextComponent
     }
 }
 
@@ -33,6 +51,19 @@ interface AppModule{
     @[IntoMap PresenterKey(SecondPresenter::class)]
     fun provideSecondPresenter(secondPresenter: SecondPresenter): Presenter
 }
+
+@Module
+interface NextModule{
+
+    @Binds
+    @[IntoMap PresenterKey(ThriplePresenter::class)]
+    fun provideFirstPresenter(thriplePresenter: ThriplePresenter): Presenter
+}
+
+@MustBeDocumented
+@Scope
+@Retention(AnnotationRetention.RUNTIME)
+annotation class NextScope
 
 @Target(AnnotationTarget.FUNCTION)
 @kotlin.annotation.Retention(AnnotationRetention.RUNTIME)

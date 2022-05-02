@@ -10,7 +10,7 @@ abstract class Presenter: UIPresenter {
 
     val presenterScope: CoroutineScope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
 
-    override fun clear() {
+    final override fun clear() {
         onClear()
         presenterScope.cancel()
     }
