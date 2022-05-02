@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 
 @Composable
-fun SecondScreen(
+fun TripleScreen(
     state: Int,
     inc: () -> Unit
 ){

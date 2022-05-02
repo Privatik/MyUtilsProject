@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class SecondPresenter @Inject constructor(): Presenter() {
+class ThriplePresenter @Inject constructor(): Presenter() {
 
     private var _count = MutableStateFlow(0)
     val count = _count.asStateFlow()
