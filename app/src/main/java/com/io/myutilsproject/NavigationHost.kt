@@ -15,7 +15,7 @@ fun RootComposeBuilder.generateGraph() {
     screen(
         name = Screens.FirstScreen.route,
     ) {
-        val controller = LocalRootController.current
+        val controller = LocalRootFacade.current
         FirstScreen{
             controller.push(Screens.SecondScreen.route)
         }
@@ -31,6 +31,13 @@ fun RootComposeBuilder.generateGraph() {
             inc = secondPresenter::inc
         )
     }
+
+//    screenWithPresenters(
+//        name = Screens.SecondScreen.route,
+//        presenters = arrayOf(SecondPresenter::class)
+//    ){ body, presenter ->
+//
+//    }
 
 //    screen(
 //        name = Screens.SecondScreen.route,
