@@ -15,9 +15,6 @@ interface AppComponent: PresenterDeps {
     @Component.Builder
     interface Builder {
 
-        @BindsInstance
-        fun factory(app: PresenterFactory): Builder
-
         fun build(): AppComponent
     }
 }
@@ -26,7 +23,7 @@ interface PresenterDeps{
     val factory: PresenterFactory
 }
 
-@Component(modules = [NextModule::class])
+@Component(modules = [NextModule::class], dependencies = [PresenterDeps::class])
 @NextScope
 interface NextComponent {
     val factory: MyPresenterFactory

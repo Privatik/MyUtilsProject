@@ -11,8 +11,8 @@ public inline fun <reified P: UIPresenter> presenter(): P {
 public fun <P : UIPresenter> presenter(
     clazz: Class<out UIPresenter>
 ): P {
-    checkNotNull(LocalPresenterFactory.current)
-    val factory = LocalPresenterFactory.current
+    checkNotNull(LocalNavigationFactory.current)
+    val factory = LocalNavigationFactory.current
 
-    return factory.create(clazz) as P
+    return factory.createPresenter(clazz)
 }
