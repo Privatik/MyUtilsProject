@@ -4,15 +4,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import com.io.navigation.LocalPresenterFactory
+import com.io.navigation.LocalNavigationFactory
+import com.io.navigation.buildWithPresenter
 import ru.alexgladkov.odyssey.compose.base.Navigator
 import ru.alexgladkov.odyssey.compose.extensions.setupWithActivity
-import ru.alexgladkov.odyssey.compose.local.LocalRootController
 import ru.alexgladkov.odyssey.compose.navigation.RootComposeBuilder
 import ru.alexgladkov.odyssey.compose.navigation.modal_navigation.ModalNavigator
-import ru.alexgladkov.odyssey.compose.setupNavigation
-import timber.log.Timber
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,20 +19,17 @@ class MainActivity : ComponentActivity() {
 //            generateGraph()
 //        }
 
-        val rootController = RootComposeBuilder().apply { generateGraph() }.build()
+        val rootController = RootComposeBuilder()
+            .apply { generateGraph() }
+            .buildWithPresenter(
+                presenterFactory = appComponent().factory
+            )
         rootController.setupWithActivity(this)
 
         setContent {
             CompositionLocalProvider(
-                LocalRootController provides rootController,
-                LocalPresenterFactory provides (applicationContext as App).appComponent.factory
+                LocalNavigationFactory provides rootController
             ) {
-//                val currentScreen = LocalRootController.current
-//                LaunchedEffect(Unit){
-//                    currentScreen.currentScreen.collect{
-//                        Timber.d("CurrentScreen ${it.screen.key}")
-//                    }
-//                }
 
                 ModalNavigator {
                     Navigator(Screens.FirstScreen.route)

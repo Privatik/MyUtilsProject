@@ -15,7 +15,7 @@ fun RootComposeBuilder.generateGraph() {
     screen(
         name = Screens.FirstScreen.route,
     ) {
-        val controller = LocalRootFacade.current
+        val controller = LocalNavigationFactory.current
         FirstScreen{
             controller.push(Screens.SecondScreen.route)
         }
@@ -31,41 +31,6 @@ fun RootComposeBuilder.generateGraph() {
             inc = secondPresenter::inc
         )
     }
-
-//    screenWithPresenters(
-//        name = Screens.SecondScreen.route,
-//        presenters = arrayOf(SecondPresenter::class)
-//    ){ body, presenter ->
-//
-//    }
-
-//    screen(
-//        name = Screens.SecondScreen.route,
-//    ){
-//        CompositionLocalProvider(
-//            LocalPresenterFactory provides
-//        ) {
-//            val secondPresenter: SecondPresenter = presenter()
-//            val state = secondPresenter.count.collectAsState()
-//            SecondScreen(
-//                state = state.value,
-//                inc = secondPresenter::inc
-//            )
-//        }
-//    }
-
-//    screenWithPresenters(
-//        name = Screens.SecondScreen.route,
-//        presenters = [SecondPresenter::class]
-//    ){
-//        SecondScreen()
-//    }
-//
-//    screenWithPresenter(
-//        name = Screens.SecondScreen.route,
-//    ) {
-//        SecondScreen()
-//    }
 }
 
 sealed class Screens(val route: String){
