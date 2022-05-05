@@ -14,4 +14,5 @@ class MyPresenterFactory @Inject constructor(
          return presenterFactories.getValue(model as Class<out Presenter>).get() as P
     }
 
+    val map = presenterFactories
 }

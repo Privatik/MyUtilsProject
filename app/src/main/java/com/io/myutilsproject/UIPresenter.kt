@@ -6,9 +6,25 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 
-abstract class Presenter: UIPresenter {
+abstract class Presenter(
+): UIPresenter {
 
-    val presenterScope: CoroutineScope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
+    private val workScope: CoroutineScope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
+    private val testScope: CoroutineScope = CoroutineScope(Dispatchers.Unconfined + SupervisorJob())
+
+    private var isTest: Boolean = false
+
+    val presenterScope: CoroutineScope
+    get() = if (isTest) testScope else workScope
+
+    init {
+        isTest = try {
+            Class.forName("org.junit.runner.Runner")
+            true
+        } catch (ignored: ClassNotFoundException) {
+            false
+        }
+    }
 
     final override fun clear() {
         onClear()
