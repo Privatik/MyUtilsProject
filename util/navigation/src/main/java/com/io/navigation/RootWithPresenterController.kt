@@ -14,6 +14,7 @@ import ru.alexgladkov.odyssey.compose.navigation.RootComposeBuilder
 import ru.alexgladkov.odyssey.core.LaunchFlag
 import ru.alexgladkov.odyssey.core.animations.defaultPushAnimation
 import ru.alexgladkov.odyssey.core.backpress.OnBackPressedDispatcher
+import java.util.*
 
 class RootWithPresenterController(
     private var presenterFactory: PresenterFactory,
@@ -26,11 +27,18 @@ class RootWithPresenterController(
 
     private val presenterExitsMap = hashMapOf<Class<out UIPresenter>, UIPresenter>()
     private val screenWithPresenterMap = hashMapOf<String, MutableList<Class<out UIPresenter>>>()
-    private val screensKeys = mutableListOf<String>()
+    private val screensKeys = Stack<String>()
 
-    private fun updateFactoryForPresenter(factory: PresenterFactory){
+    fun updateFactoryForPresenter(factory: PresenterFactory){
         presenterFactory = factory
     }
+
+    fun present(
+        screen: String,
+        params: Any? = null,
+        launchFlag: LaunchFlag? = null,
+        presenterFactory: (() -> PresenterFactory)? = null
+    ) = this::push
 
     fun push(
         screen: String,
@@ -38,7 +46,7 @@ class RootWithPresenterController(
         launchFlag: LaunchFlag? = null,
         presenterFactory: (() -> PresenterFactory)? = null
     ) {
-        screensKeys.add(screen)
+        screensKeys.push(screen)
         screenWithPresenterMap[screen] = mutableListOf()
 
         if (presenterFactory != null){
@@ -55,8 +63,22 @@ class RootWithPresenterController(
         )
     }
 
+    override fun popBackStack() {
+        removeLastScreenWithPresenters()
+        super.popBackStack()
+    }
+
+    fun backToScreenAndRemovePresenters(screen: String){
+        var topScreen = currentScreenKey
+        while (topScreen != screen){
+            removeLastScreenWithPresenters()
+            topScreen = screensKeys.peek() ?: throw RuntimeException("Not found screen")
+        }
+        backToScreen(screen)
+    }
+
     fun removeLastScreenWithPresenters(){
-        val screen = screensKeys.removeLast()
+        val screen = screensKeys.pop()
         screenWithPresenterMap.remove(screen)?.forEach { clazzPresenter ->
             presenterExitsMap.remove(clazzPresenter)?.clear()
         }
@@ -70,9 +92,7 @@ class RootWithPresenterController(
             return presenterExitsMap[clazz]!! as P
         } else {
             val presenter = presenterFactory.create<P>(clazz)
-            screenWithPresenterMap[currentScreenKey]?.apply {
-                add(clazz)
-            }
+            screenWithPresenterMap[currentScreenKey]?.apply { add(clazz) }
             presenterExitsMap[clazz] = presenter
             return presenter
         }
