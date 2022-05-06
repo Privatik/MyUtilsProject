@@ -1,8 +1,13 @@
 package com.io.myutilsproject
 
+import com.io.myutilsproject.screens.first.FirstPresenter
+import com.io.myutilsproject.screens.second.SecondPresenter
+import com.io.myutilsproject.screens.third.ThirdPresenter
 import com.io.navigation.PresenterFactory
 import dagger.*
 import dagger.multibindings.IntoMap
+import dagger.multibindings.Multibinds
+import javax.inject.Provider
 import javax.inject.Scope
 import javax.inject.Singleton
 import kotlin.reflect.KClass
@@ -40,6 +45,9 @@ interface NextComponent {
 @Module
 interface AppModule{
 
+    @Multibinds
+    fun provideEmptyPresenters(): Map<Class<out Presenter>, Presenter>
+
     @Binds
     @[IntoMap PresenterKey(FirstPresenter::class)]
     fun provideFirstPresenter(firstPresenter: FirstPresenter): Presenter
@@ -53,8 +61,8 @@ interface AppModule{
 interface NextModule{
 
     @Binds
-    @[IntoMap PresenterKey(ThriplePresenter::class)]
-    fun provideFirstPresenter(thriplePresenter: ThriplePresenter): Presenter
+    @[IntoMap PresenterKey(ThirdPresenter::class)]
+    fun provideFirstPresenter(thirdPresenter: ThirdPresenter): Presenter
 }
 
 @MustBeDocumented

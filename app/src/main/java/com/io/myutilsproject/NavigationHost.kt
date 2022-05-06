@@ -1,9 +1,14 @@
 package com.io.myutilsproject
 
 import androidx.compose.runtime.collectAsState
+import com.io.myutilsproject.screens.first.FirstScreen
+import com.io.myutilsproject.screens.second.SecondPresenter
+import com.io.myutilsproject.screens.second.SecondScreen
+import com.io.myutilsproject.screens.third.ThirdPresenter
+import com.io.myutilsproject.screens.third.TripleScreen
 import com.io.navigation.*
-import ru.alexgladkov.odyssey.compose.extensions.flow
 import ru.alexgladkov.odyssey.compose.extensions.present
+import ru.alexgladkov.odyssey.compose.extensions.push
 import ru.alexgladkov.odyssey.compose.extensions.screen
 import ru.alexgladkov.odyssey.compose.local.LocalRootController
 import ru.alexgladkov.odyssey.compose.navigation.RootComposeBuilder
@@ -17,6 +22,7 @@ fun RootComposeBuilder.generateGraph() {
         val controller = LocalRootController.current.asPresenterController()
         FirstScreen{
             controller.push(Screens.SecondScreen.route)
+            controller.present(Screens.SecondScreen.route)
         }
     }
 
@@ -30,22 +36,22 @@ fun RootComposeBuilder.generateGraph() {
             state = state.value,
             inc = secondPresenter::inc,
             open = {
-                controller.pushAndCreateScope(
-                    screen = Screens.TripleScreen.route,
-                    createScope = ::createNextScope
+                controller.push(
+                    screen = Screens.ThirdScreen.route,
+                    presenterFactory = ::createNextComponent
                 )
             }
         )
     }
 
     screen(
-        name = Screens.SecondScreen.route,
+        name = Screens.ThirdScreen.route,
     ){
-        val thriplePresenter: ThriplePresenter = presenter()
-        val state = thriplePresenter.count.collectAsState()
+        val thirdPresenter: ThirdPresenter = presenter()
+        val state = thirdPresenter.count.collectAsState()
         TripleScreen(
             state = state.value,
-            inc = thriplePresenter::inc,
+            inc = thirdPresenter::inc,
         )
     }
 }
@@ -53,5 +59,5 @@ fun RootComposeBuilder.generateGraph() {
 sealed class Screens(val route: String){
     object FirstScreen: Screens("first")
     object SecondScreen: Screens("second")
-    object TripleScreen: Screens("triple")
+    object ThirdScreen: Screens("triple")
 }

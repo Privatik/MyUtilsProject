@@ -1,5 +1,6 @@
-package com.io.myutilsproject
+package com.io.myutilsproject.screens.second
 
+import com.io.myutilsproject.Presenter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
