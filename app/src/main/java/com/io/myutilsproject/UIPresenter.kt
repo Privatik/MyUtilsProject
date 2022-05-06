@@ -10,12 +10,12 @@ abstract class Presenter(
 ): UIPresenter {
 
     private val workScope: CoroutineScope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
-    private val testScope: CoroutineScope = CoroutineScope(Dispatchers.Unconfined + SupervisorJob())
+    private val testScope: CoroutineScope = CoroutineScope(Dispatchers.Unconfined)
 
     private var isTest: Boolean = false
 
     val presenterScope: CoroutineScope
-    get() = if (isTest) testScope else workScope
+        get() = if (isTest) testScope else workScope
 
     init {
         isTest = try {

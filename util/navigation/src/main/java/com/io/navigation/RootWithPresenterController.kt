@@ -9,9 +9,12 @@ import ru.alexgladkov.odyssey.compose.AllowedDestination
 import ru.alexgladkov.odyssey.compose.RenderWithParams
 import ru.alexgladkov.odyssey.compose.RootController
 import ru.alexgladkov.odyssey.compose.RootControllerType
+import ru.alexgladkov.odyssey.compose.extensions.present
 import ru.alexgladkov.odyssey.compose.extensions.push
 import ru.alexgladkov.odyssey.compose.navigation.RootComposeBuilder
 import ru.alexgladkov.odyssey.core.LaunchFlag
+import ru.alexgladkov.odyssey.core.animations.AnimationType
+import ru.alexgladkov.odyssey.core.animations.defaultPresentationAnimation
 import ru.alexgladkov.odyssey.core.animations.defaultPushAnimation
 import ru.alexgladkov.odyssey.core.backpress.OnBackPressedDispatcher
 import java.util.*
@@ -27,18 +30,57 @@ class RootWithPresenterController(
 
     private val presenterExitsMap = hashMapOf<Class<out UIPresenter>, UIPresenter>()
     private val screenWithPresenterMap = hashMapOf<String, MutableList<Class<out UIPresenter>>>()
-    private val screensKeys = Stack<String>()
+    private val screensKeys = Stack<ScreenInfo>()
 
-    fun updateFactoryForPresenter(factory: PresenterFactory){
-        presenterFactory = factory
+    fun launch(
+        screen: String,
+        startScreen: String? = null,
+        startTabPosition: Int = 0,
+        params: Any? = null,
+        animationType: AnimationType = AnimationType.None,
+        launchFlag: LaunchFlag? = null,
+        presenterFactory: (() -> PresenterFactory)? = null
+    ) {
+
+        val screenInfo = ScreenInfo(
+            screen = screen,
+            presenterFactory = presenterFactory?.invoke()
+        )
+
+        screensKeys.push(screenInfo)
+        screenWithPresenterMap[screen] = mutableListOf()
+
+        updateFactoryForPresenter(screenInfo.presenterFactory)
+
+        launch(
+            screen = screen,
+            startScreen = startScreen,
+            startTabPosition = startTabPosition,
+            params = params,
+            animationType = animationType,
+            launchFlag = launchFlag,
+            deepLink = false
+        )
     }
 
     fun present(
         screen: String,
+        startTabPosition: Int = 0,
+        startScreen: String? = null,
         params: Any? = null,
         launchFlag: LaunchFlag? = null,
         presenterFactory: (() -> PresenterFactory)? = null
-    ) = this::push
+    ) {
+        launch(
+            screen = screen,
+            startScreen = startScreen,
+            startTabPosition = startTabPosition,
+            params = params,
+            animationType = defaultPresentationAnimation(),
+            launchFlag = launchFlag,
+            presenterFactory = presenterFactory
+        )
+    }
 
     fun push(
         screen: String,
@@ -46,20 +88,14 @@ class RootWithPresenterController(
         launchFlag: LaunchFlag? = null,
         presenterFactory: (() -> PresenterFactory)? = null
     ) {
-        screensKeys.push(screen)
-        screenWithPresenterMap[screen] = mutableListOf()
-
-        if (presenterFactory != null){
-            updateFactoryForPresenter(presenterFactory())
-        }
-
         launch(
             screen = screen,
             startScreen = null,
             startTabPosition = 0,
             params = params,
             animationType = defaultPushAnimation(),
-            launchFlag
+            launchFlag = launchFlag,
+            presenterFactory = presenterFactory
         )
     }
 
@@ -72,14 +108,23 @@ class RootWithPresenterController(
         var topScreen = currentScreenKey
         while (topScreen != screen){
             removeLastScreenWithPresenters()
-            topScreen = screensKeys.peek() ?: throw RuntimeException("Not found screen")
+            val screenInfo = screensKeys.peek() ?: throw RuntimeException("Not found screen")
+
+            topScreen = screenInfo.screen
+            updateFactoryForPresenter(screenInfo.presenterFactory)
         }
+
         backToScreen(screen)
     }
 
-    fun removeLastScreenWithPresenters(){
+    private fun updateFactoryForPresenter(factory: PresenterFactory?){
+        if (factory == null) return
+        presenterFactory = factory
+    }
+
+    private fun removeLastScreenWithPresenters(){
         val screen = screensKeys.pop()
-        screenWithPresenterMap.remove(screen)?.forEach { clazzPresenter ->
+        screenWithPresenterMap.remove(screen.screen)?.forEach { clazzPresenter ->
             presenterExitsMap.remove(clazzPresenter)?.clear()
         }
     }

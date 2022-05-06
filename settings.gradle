@@ -10,3 +10,4 @@ rootProject.name = "MyUtilsProject"
 include ':app'
 include ':util:navigation'
 include ':another'
+include ':util:machine'

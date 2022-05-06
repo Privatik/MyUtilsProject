@@ -16,5 +16,6 @@ class App: Application() {
         }
 
         _appComponent = DaggerAppComponent.builder().build()
+        PresenterStore.update(appComponent)
     }
 }

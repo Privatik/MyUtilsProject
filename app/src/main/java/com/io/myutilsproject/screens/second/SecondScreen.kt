@@ -1,4 +1,4 @@
-package com.io.myutilsproject
+package com.io.myutilsproject.screens.second
 
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable

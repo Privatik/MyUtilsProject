@@ -31,23 +31,6 @@ fun RootComposeBuilder.buildWithPresenter(
 
 }
 
-fun <Scope: Any> RootWithPresenterController.pushAndCreateScope(
-    screen: String,
-    params: Any? = null,
-    createScope: () -> Scope,
-    launchFlag: LaunchFlag? = null,
-    presenterFactory: (() -> PresenterFactory)? = null
-){
-
-
-    push(
-        screen = screen,
-        params = params,
-        launchFlag = launchFlag,
-        presenterFactory = presenterFactory
-    )
-}
-
 fun RootController.asPresenterController(): RootWithPresenterController{
     return this as RootWithPresenterController
 }
