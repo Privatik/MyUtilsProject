@@ -1,6 +1,7 @@
 package com.io.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import ru.alexgladkov.odyssey.compose.local.LocalRootController
 
 @Composable
@@ -15,5 +16,7 @@ public fun <P : UIPresenter> presenter(
     checkNotNull(LocalRootController.current)
     val controller = LocalRootController.current.asPresenterController()
 
-    return controller.createPresenter(clazz)
+    return remember {
+        controller.createPresenter(clazz)
+    }
 }

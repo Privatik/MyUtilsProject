@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
         val rootController = RootComposeBuilder()
             .apply { generateGraph() }
             .buildWithPresenter(
-                presenterFactory = appComponent().factory
+                presenterFactory = ::createAppComponent
             )
         rootController.setupWithActivity(this)
 

@@ -6,7 +6,6 @@ import com.io.navigation.RootWithPresenterController
 fun createNextScope(): NextComponent{
     val component = DaggerNextComponent
         .builder()
-        .deps(PresenterStore.presenterDeps)
         .build()
 
     return component

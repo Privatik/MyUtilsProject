@@ -11,7 +11,7 @@ import ru.alexgladkov.odyssey.core.LaunchFlag
 fun RootComposeBuilder.buildWithPresenter(
     rootControllerType: RootControllerType = RootControllerType.Root,
     backgroundColor: Color = Color.White,
-    presenterFactory: PresenterFactory
+    presenterFactory: () -> PresenterFactory = ::emptyPresenter
 ): RootWithPresenterController{
     val screens = javaClass.getDeclaredField("_screens")
     screens.isAccessible = true
@@ -19,7 +19,7 @@ fun RootComposeBuilder.buildWithPresenter(
     screenMap.isAccessible = true
 
     return RootWithPresenterController(
-        presenterFactory = presenterFactory,
+        startPresenterFactory = presenterFactory,
         rootControllerType = rootControllerType,
         backgroundColor = backgroundColor,
     ).apply {
