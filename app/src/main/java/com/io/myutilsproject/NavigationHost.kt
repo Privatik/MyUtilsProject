@@ -22,7 +22,6 @@ fun RootComposeBuilder.generateGraph() {
         val controller = LocalRootController.current.asPresenterController()
         FirstScreen{
             controller.push(Screens.SecondScreen.route)
-            controller.present(Screens.SecondScreen.route)
         }
     }
 
@@ -32,6 +31,7 @@ fun RootComposeBuilder.generateGraph() {
         val controller = LocalRootController.current.asPresenterController()
         val secondPresenter: SecondPresenter = presenter()
         val state = secondPresenter.count.collectAsState()
+
         SecondScreen(
             state = state.value,
             inc = secondPresenter::inc,

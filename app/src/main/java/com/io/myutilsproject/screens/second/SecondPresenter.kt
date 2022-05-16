@@ -13,7 +13,7 @@ class SecondPresenter @Inject constructor(): Presenter() {
 
     fun inc(){
         presenterScope.launch {
-            _count.value = _count.value++
+            _count.value = _count.value + 1
         }
     }
 

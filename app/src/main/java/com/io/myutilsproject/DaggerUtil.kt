@@ -9,5 +9,5 @@ fun createAppComponent(): PresenterFactory{
 }
 
 fun createNextComponent(): PresenterFactory{
-    return DaggerNextComponent.builder().deps(PresenterStore.presenterDeps).build().factory
+    return DaggerNextComponent.builder().build().factory
 }

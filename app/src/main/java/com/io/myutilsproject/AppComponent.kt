@@ -28,15 +28,13 @@ interface PresenterDeps{
     val factory: PresenterFactory
 }
 
-@Component(modules = [NextModule::class], dependencies = [PresenterDeps::class])
+@Component(modules = [NextModule::class])
 @NextScope
 interface NextComponent {
     val factory: MyPresenterFactory
 
     @Component.Builder
     interface Builder {
-
-        fun deps(deps: PresenterDeps): Builder
 
         fun build(): NextComponent
     }

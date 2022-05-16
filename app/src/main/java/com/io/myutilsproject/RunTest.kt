@@ -9,7 +9,7 @@ fun test(){
 
     println("AppComponent ${appComponent.factory.map.map { it.key.simpleName }}")
 
-    val nextComponent = DaggerNextComponent.builder().deps(appComponent).build()
+    val nextComponent = DaggerNextComponent.builder().build()
 
     println("NextComponent ${nextComponent.factory.map.map { it.key.simpleName }}")
 }
