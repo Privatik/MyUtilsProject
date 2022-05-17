@@ -47,11 +47,15 @@ fun RootComposeBuilder.generateGraph() {
     screen(
         name = Screens.ThirdScreen.route,
     ){
+        val controller = LocalRootController.current.asPresenterController()
         val thirdPresenter: ThirdPresenter = presenter()
         val state = thirdPresenter.count.collectAsState()
         TripleScreen(
             state = state.value,
             inc = thirdPresenter::inc,
+            backToFirst = {
+                controller.backToScreenWithPresenter(Screens.FirstScreen.route)
+            }
         )
     }
 }
