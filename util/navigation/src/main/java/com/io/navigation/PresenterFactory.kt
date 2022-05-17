@@ -7,6 +7,7 @@ interface PresenterFactory{
 
 class EmptyPresenterFactory: PresenterFactory{
     override fun <P : UIPresenter> create(model: Class<out UIPresenter>): P {
-        throw NoSuchMethodException("Not PresenterFactory")
+        @Suppress("UNCHECKED_CAST")
+        return model.newInstance() as P
     }
 }
