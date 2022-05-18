@@ -4,19 +4,19 @@ import kotlinx.coroutines.flow.Flow
 import kotlin.properties.Delegates
 
 internal typealias RenderState<S, P> = (oldState: S, payload: P) -> S
-internal typealias DoAction<S, P> = (oldState: S, newState: S, payload: P) -> Unit
+internal typealias DoAction<S, P> = suspend (oldState: S, newState: S, payload: P) -> Unit
 
-class Machine<S: Any> internal constructor(){
-    val initState: () -> S by Delegates.notNull()
-    internal val transactions = mutableListOf<Transaction<S,out Any>>()
+class MachineDSL<S: Any> internal constructor(){
+    var initState: suspend () -> S by Delegates.notNull()
+    internal val transactions = mutableListOf<TransactionDSL<S,out Any>>()
 
-    fun <P: Any> onEach(everyFlow: Flow<P>, body: Transaction<S,P>.() -> Unit){
-        val transaction = Transaction<S,P>(everyFlow).apply(body)
+    fun <P: Any> onEach(everyFlow: Flow<P>, body: TransactionDSL<S,P>.() -> Unit){
+        val transaction = TransactionDSL<S,P>(everyFlow).apply(body)
         transactions.add(transaction)
     }
 }
 
-class Transaction<S: Any, P: Any> internal constructor(
+class TransactionDSL<S: Any, P: Any> internal constructor(
     val everyFlow: Flow<P>
 ){
     var render: RenderState<S, P>? = null
