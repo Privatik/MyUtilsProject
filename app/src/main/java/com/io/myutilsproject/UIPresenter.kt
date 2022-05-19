@@ -1,6 +1,5 @@
 package com.io.myutilsproject
 
-import com.example.machine.Machine
 import com.example.machine.MachineDSL
 import com.example.machine.machine
 import com.io.navigation.UIPresenter
@@ -8,26 +7,22 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 
-abstract class Presenter<S: Any, I: Any, E: Any>: UIPresenter {
+abstract class Presenter<S: Any, I: Any, E: Any> constructor(initState: S): UIPresenter {
 
     private val presenterScope: CoroutineScope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
 
-    private val _state = MutableSharedFlow<S>(replay = 1)
-    val state = _state.asSharedFlow()
+    private val _state = MutableStateFlow<S>(initState)
+    val state = _state.asStateFlow()
 
     private val _singleEffect = MutableSharedFlow<E>()
     val singleEffect = _singleEffect.asSharedFlow()
 
-    abstract val Machine<S>.buildMachine: MachineDSL<S>.() -> Unit
+    abstract val buildMachine: MachineDSL<S>.() -> Unit
 
     init {
-        @Suppress("LeakingThis")
-        val machine = machine<S>().apply { buildMachine() }
+        val machine = machine<S>(initState) { buildMachine() }
         machine.state
             .onEach {
                 _state.emit(it)
@@ -40,9 +35,6 @@ abstract class Presenter<S: Any, I: Any, E: Any>: UIPresenter {
     }
 
     final override fun clear() {
-        onClear()
         presenterScope.cancel()
     }
-
-    open fun onClear() {}
 }

@@ -30,7 +30,7 @@ fun RootComposeBuilder.generateGraph() {
     ){
         val controller = LocalRootController.current.asPresenterController()
         val secondPresenter: SecondPresenter = presenter()
-        val state = secondPresenter.count.collectAsState()
+        val state = secondPresenter.state.collectAsState()
 
         SecondScreen(
             state = state.value,

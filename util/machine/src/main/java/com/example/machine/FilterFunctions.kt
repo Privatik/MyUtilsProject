@@ -1,9 +1,11 @@
 package com.example.machine
 
-fun <S: Any, P: Any> RenderState<S,P>?.get(): RenderState<S,P>{
-    return this ?: { S, _ -> S}
+internal fun <S: Any> RenderState<S>?.get(oldState: S, payload: Any): S{
+    val funState = this ?: { S, _ -> S}
+    return funState(oldState, payload)
 }
 
-fun <S: Any, P: Any> DoAction<S, P>?.get(): DoAction<S, P>{
-    return this ?: { _, _, _ -> }
+internal suspend fun <S: Any> DoAction<S>?.get(oldState: S, newState: S, payload: Any){
+    val funAction = this ?: { _, _, _ -> }
+    funAction(oldState, newState, payload)
 }

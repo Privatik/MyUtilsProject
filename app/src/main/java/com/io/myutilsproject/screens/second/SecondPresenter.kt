@@ -1,5 +1,6 @@
 package com.io.myutilsproject.screens.second
 
+import androidx.compose.runtime.Stable
 import com.example.machine.Machine
 import com.example.machine.MachineDSL
 import com.io.myutilsproject.Presenter
@@ -9,10 +10,12 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class SecondPresenter @Inject constructor(): Presenter<Any,Any,Any>() {
+@Stable
+data class SecondState(
+    val count: Int = 0
+)
 
-    private var _count = MutableStateFlow(0)
-    val count = _count.asStateFlow()
+class SecondPresenter @Inject constructor(): Presenter<SecondState,Any,Any>(SecondState()) {
 
     fun inc(){
 //        presenterScope.launch {
@@ -20,14 +23,24 @@ class SecondPresenter @Inject constructor(): Presenter<Any,Any,Any>() {
 //        }
     }
 
-    val buildMachine: MachineDSL<Any>.() -> Unit = {
-        onEach(flowOf(1,2,3)){
+    override val buildMachine: (MachineDSL<SecondState>.() -> Unit) = {
+        startState = SecondState()
+        startAction = {
 
         }
-    }
-    override val MachineDSL<Any>.buildMachine: Machine<Any>.() -> Unit = {
-        onEach(flowOf(1,2,3)){
 
+        startAction = {
+
+        }
+
+        onEach(flowOf<Int>(1,2,3)){
+            state { oldState, payload ->
+                oldState.copy(count = payload)
+            }
+
+            action { oldState, newState, payload ->
+
+            }
         }
     }
 
