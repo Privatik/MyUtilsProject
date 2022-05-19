@@ -20,7 +20,7 @@ import ru.alexgladkov.odyssey.compose.local.LocalRootController
 
 @Composable
 fun SecondScreen(
-    state: Int,
+    state: SecondState,
     inc: () -> Unit,
     open: () -> Unit
 ){
@@ -32,9 +32,9 @@ fun SecondScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (currentConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
-            Text(text = "Second screen LANDSCAPE ${state}")
+            Text(text = "Second screen LANDSCAPE ${state.count}")
         } else {
-            Text(text = "Second screen PORTSCAPE ${state}")
+            Text(text = "Second screen PORTSCAPE ${state.count}")
         }
         Button(onClick = { open() }) {
             Text(text = "Open")
