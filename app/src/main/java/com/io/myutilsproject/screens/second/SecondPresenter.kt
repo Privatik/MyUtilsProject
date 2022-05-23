@@ -1,13 +1,9 @@
 package com.io.myutilsproject.screens.second
 
 import androidx.compose.runtime.Stable
-import com.example.machine.Machine
 import com.example.machine.MachineDSL
 import com.io.myutilsproject.Presenter
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @Stable
@@ -15,7 +11,11 @@ data class SecondState(
     val count: Int = 0
 )
 
-class SecondPresenter @Inject constructor(): Presenter<SecondState,Any,Any>(SecondState()) {
+sealed class SecondEffect{
+    data class Snack(val message: String): SecondEffect()
+}
+
+class SecondPresenter @Inject constructor(): Presenter<SecondState, Any , SecondEffect>(SecondState()) {
 
     fun inc(){
 //        presenterScope.launch {
@@ -23,17 +23,8 @@ class SecondPresenter @Inject constructor(): Presenter<SecondState,Any,Any>(Seco
 //        }
     }
 
-    override val buildMachine: (MachineDSL<SecondState>.() -> Unit) = {
-        startState = SecondState()
-        startAction = {
-
-        }
-
-        startAction = {
-
-        }
-
-        onEach(flowOf<Int>(1,2,3)){
+    override val buildMachine: MachineDSL<SecondState, SecondEffect>.() -> Unit = {
+        onEach(flowOf(1,2,3)){
             state { oldState, payload ->
                 oldState.copy(count = payload)
             }
@@ -41,6 +32,16 @@ class SecondPresenter @Inject constructor(): Presenter<SecondState,Any,Any>(Seco
             action { oldState, newState, payload ->
 
             }
+        }
+
+        onEach(flowOf(1,2,3)){
+            state { oldState, payload ->
+                oldState.copy(count = payload)
+            }
+
+//            effect { oldState, newState, payload ->
+//                SecondEffect.Snack("Hello")
+//            }
         }
     }
 

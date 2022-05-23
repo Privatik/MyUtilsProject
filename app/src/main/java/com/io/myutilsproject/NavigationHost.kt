@@ -49,7 +49,7 @@ fun RootComposeBuilder.generateGraph() {
     ){
         val controller = LocalRootController.current.asPresenterController()
         val thirdPresenter: ThirdPresenter = presenter()
-        val state = thirdPresenter.count.collectAsState()
+        val state = thirdPresenter.state.collectAsState()
         TripleScreen(
             state = state.value,
             inc = thirdPresenter::inc,

@@ -15,7 +15,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 
 @Composable
 fun TripleScreen(
-    state: Int,
+    state: ThirdState,
     inc: () -> Unit,
     backToFirst: () -> Unit
 ){
@@ -27,9 +27,9 @@ fun TripleScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (currentConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
-            Text(text = "Second screen LANDSCAPE $state")
+            Text(text = "Second screen LANDSCAPE ${state.count}")
         } else {
-            Text(text = "Second screen PORTSCAPE $state")
+            Text(text = "Second screen PORTSCAPE ${state.count}")
         }
         Button(onClick = { backToFirst() }) {
 

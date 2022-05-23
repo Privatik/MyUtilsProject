@@ -3,38 +3,34 @@ package com.example.machine
 import kotlinx.coroutines.flow.Flow
 import kotlin.properties.Delegates
 
-internal typealias RenderState<S> = (oldState: S, payload: Any) -> S
-internal typealias DoAction<S> = suspend (oldState: S, newState: S, payload: Any) -> Unit
+internal typealias RenderState<S, P> = (oldState: S, payload: P) -> S
+internal typealias DoAction<S, P> = suspend (oldState: S, newState: S, payload: P) -> Unit
+internal typealias GetEffect<S, P, E> = suspend (oldState: S, newState: S, payload: P) -> E
 
-class MachineDSL<S: Any> internal constructor(){
+class MachineDSL<S: Any, E: Any> internal constructor(){
     internal val transactions = mutableListOf<TransactionDSL<S, out Any>>()
 
-    var startState: S by Delegates.notNull()
-    var startAction: (suspend () -> Unit)? = null
-
-    fun <P: Any> onEach(everyFlow: Flow<P>, body: TransactionDSL<S,P>.() -> Unit){
-        val transaction = TransactionDSL<S,P>(everyFlow).apply(body)
+    fun <P: Any> onEach(everyFlow: Flow<P>, body: TransactionAction<S,P>.() -> Unit){
+        val transaction = TransactionAction<S,P>(everyFlow).apply(body)
         transactions.add(transaction)
     }
+
+//    @JvmName("onEachEffect")
+//    fun <P: Any> onEach(everyFlow: Flow<P>, body: TransactionGetEffect<S,P,E>.() -> Unit){
+//        val transaction = TransactionGetEffect<S,P,E>(everyFlow).apply(body)
+//        transactions.add(transaction)
+//    }
 }
 
-class TransactionDSL<S: Any, P: Any> internal constructor(
+abstract class TransactionDSL<S: Any, P: Any> internal constructor(
     internal val everyFlow: Flow<P>
 ){
-    internal var render: RenderState<S>? = null
-    internal var actionBody: DoAction<S>? = null
+    internal var render: RenderState<S,P>? = null
 
-    fun state(body: RenderState<S>){
+    fun state(body: RenderState<S,P>){
         check(render == null){
             "\"state\" can only one"
         }
         render = body
-    }
-
-    fun action(body: DoAction<S>){
-        check(actionBody == null){
-            "\"action\" can only one"
-        }
-        actionBody = body
     }
 }
