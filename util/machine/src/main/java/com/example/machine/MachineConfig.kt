@@ -22,7 +22,7 @@ fun <S: Any, E: Any> machine(
                     .merge()
                     .scan(initPair){ oldPair, transaction ->
                         val newState = transaction.second.render.get(oldPair.first, transaction.first)
-                        val effect = transaction.second.get<S, Any, E>(oldPair.first, newState, transaction.first)
+                        val effect = transaction.second.get(oldPair.first, newState, transaction.first)
                         newState to effect
                     }.transform {
                         emit(it.first)

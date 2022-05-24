@@ -1,6 +1,6 @@
 package com.example.machine
 
-internal suspend fun<S: Any, P: Any, E: Any> TransactionDSL<S, P>.get(oldState: S, newState: S, payload: Any): E?{
+internal suspend fun<S: Any, P: Any, E: Any> Transaction<S, P>.get(oldState: S, newState: S, payload: P): E?{
     return if (this.isAction()){
         this.asAction().actionBody.get(oldState, newState, payload)
         null
@@ -9,15 +9,15 @@ internal suspend fun<S: Any, P: Any, E: Any> TransactionDSL<S, P>.get(oldState: 
     }
 }
 
-internal fun <S: Any, P: Any> TransactionDSL<S, P>.isAction(): Boolean{
+internal fun <S: Any, P: Any> Transaction<S, P>.isAction(): Boolean{
     return this is TransactionAction<S, P>
 }
 
-internal fun <S: Any, P: Any> TransactionDSL<S, P>.asAction(): TransactionAction<S, P>{
+internal fun <S: Any, P: Any> Transaction<S, P>.asAction(): TransactionAction<S, P>{
     return this as TransactionAction<S, P>
 }
 
-internal fun <S: Any, P: Any, E: Any> TransactionDSL<S,P>.asEffect(): TransactionGetEffect<S, P, E>{
+internal fun <S: Any, P: Any, E: Any> Transaction<S,P>.asEffect(): TransactionGetEffect<S, P, E>{
     @Suppress("UNCHECKED_CAST")
     return this as TransactionGetEffect<S, P, E>
 }
