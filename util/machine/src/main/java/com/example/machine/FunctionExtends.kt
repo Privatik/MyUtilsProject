@@ -1,6 +1,6 @@
 package com.example.machine
 
-internal fun <S,P: Any> RenderState<S, P>?.get(oldState: S, payload: P): S{
+internal fun <S: Any> RenderState<S, Any>?.get(oldState: S, payload: Any): S{
     val funState = this ?: { S, _ -> S}
     return funState(oldState, payload)
 }

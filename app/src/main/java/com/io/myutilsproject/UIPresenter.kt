@@ -3,10 +3,7 @@ package com.io.myutilsproject
 import com.example.machine.MachineDSL
 import com.example.machine.machine
 import com.io.navigation.UIPresenter
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 abstract class Presenter<S: Any, I: Any, E: Any> constructor(initState: S): UIPresenter {
@@ -19,7 +16,15 @@ abstract class Presenter<S: Any, I: Any, E: Any> constructor(initState: S): UIPr
     private val _singleEffect = MutableSharedFlow<E>()
     val singleEffect = _singleEffect.asSharedFlow()
 
-    abstract val buildMachine: MachineDSL<S, E>.() -> Unit
+    protected val incFlow = MutableSharedFlow<Int>()
+
+    fun inc(count: Int){
+        presenterScope.launch {
+            incFlow.emit(count + 1)
+        }
+    }
+
+    protected abstract val buildMachine: MachineDSL<S, E>.() -> Unit
 
     init {
         val machine = machine<S, E>(initState, ::initAction) { buildMachine() }
@@ -30,7 +35,7 @@ abstract class Presenter<S: Any, I: Any, E: Any> constructor(initState: S): UIPr
             .launchIn(presenterScope)
     }
 
-    open suspend fun initAction(state: S) {
+    protected open suspend fun initAction(state: S) {
 
     }
 

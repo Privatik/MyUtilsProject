@@ -3,6 +3,7 @@ package com.io.myutilsproject.screens.second
 import androidx.compose.runtime.Stable
 import com.example.machine.MachineDSL
 import com.io.myutilsproject.Presenter
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
@@ -17,32 +18,18 @@ sealed class SecondEffect{
 
 class SecondPresenter @Inject constructor(): Presenter<SecondState, Any , SecondEffect>(SecondState()) {
 
-    fun inc(){
-//        presenterScope.launch {
-//            _count.value = _count.value + 1
-//        }
-    }
-
     override val buildMachine: MachineDSL<SecondState, SecondEffect>.() -> Unit = {
-        onEach(flowOf(1,2,3)){
-            state { oldState, payload ->
-                oldState.copy(count = payload)
+        onEach(
+            everyFlow = incFlow,
+            updateState = { oldState, payload -> oldState.copy(count = payload) },
+            effect = { _, _, payload ->
+                if (payload % 10 == 0 && payload != 0){
+                    SecondEffect.Snack("Ten")
+                } else {
+                    null
+                }
             }
-
-            action { oldState, newState, payload ->
-
-            }
-        }
-
-        onEach(flowOf(1,2,3)){
-            state { oldState, payload ->
-                oldState.copy(count = payload)
-            }
-
-//            effect { oldState, newState, payload ->
-//                SecondEffect.Snack("Hello")
-//            }
-        }
+        )
     }
 
 }
