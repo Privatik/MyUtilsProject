@@ -7,7 +7,7 @@ fun <S: Any, E: Any> machine(
     intiAction: suspend (state: S) -> Unit,
     buildMachineDSL: MachineDSL<S, E>.() -> Unit
 ): Machine<S, E>{
-    val initPair = Pair<S, E?>(initState, null)
+    val initStep = Step<S, E>(initState, null)
 
     val dsl = MachineDSL<S, E>().apply(buildMachineDSL)
 
@@ -18,23 +18,32 @@ fun <S: Any, E: Any> machine(
         override val state: Flow<S>
             get() {
                 return dsl.transactions
-                    .map { it.everyFlow.map { payload -> payload to it } }
+                    .map { it.everyFlow.map { payload -> Body(payload, it) } }
                     .merge()
-                    .scan(initPair){ oldPair, transaction ->
-                        val newState = transaction.second.render.get(oldPair.first, transaction.first)
-                        val effect = transaction.second.get(oldPair.first, newState, transaction.first)
-                        newState to effect
+                    .catch { println("Machine Error $it") }
+                    .scan(initStep){ oldStep, body ->
+                        val newState = body.transaction.render.get(oldStep.state, body.payload)
+                        val effect: E? = body.transaction.get(oldStep.state, newState, body.payload)
+                        Step(newState, effect)
                     }.transform {
-                        emit(it.first)
-                        it.second?.run {
-                            _effects.emit(this)
-                        }
+                        emit(it.state)
+                        it.effect?.run { _effects.emit(this) }
                     }.onStart {
                         intiAction(initState)
                     }
             }
     }
 }
+
+internal data class Step<S: Any, E: Any>(
+    val state: S,
+    val effect: E?
+)
+
+internal data class Body<S: Any, P : Any>(
+    val payload: P,
+    val transaction: Transaction<S, out Any>
+)
 
 interface Machine<S: Any, E: Any>{
     val state: Flow<S>

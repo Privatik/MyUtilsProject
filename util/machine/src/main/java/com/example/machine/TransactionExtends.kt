@@ -1,6 +1,6 @@
 package com.example.machine
 
-internal suspend fun<S: Any, P: Any, E: Any> Transaction<S, P>.get(oldState: S, newState: S, payload: P): E?{
+internal suspend fun<S: Any, P: Any, E: Any> Transaction<S, P>.get(oldState: S, newState: S, payload: Any): E?{
     return if (this.isAction()){
         this.asAction().actionBody.get(oldState, newState, payload)
         null

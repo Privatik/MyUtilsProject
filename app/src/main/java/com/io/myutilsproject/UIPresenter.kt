@@ -6,6 +6,7 @@ import com.io.navigation.UIPresenter
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
+@Suppress("LeakingThis")
 abstract class Presenter<S: Any, I: Any, E: Any> constructor(initState: S): UIPresenter {
 
     private val presenterScope: CoroutineScope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
@@ -24,24 +25,23 @@ abstract class Presenter<S: Any, I: Any, E: Any> constructor(initState: S): UIPr
         }
     }
 
-    protected abstract val buildMachine: MachineDSL<S, E>.() -> Unit
+    protected abstract fun buildMachine(): MachineDSL<S, E>.() -> Unit
 
     init {
-        val machine = machine<S, E>(initState, ::initAction) { buildMachine() }
+        val machine = machine<S, E>(initState, ::initAction, buildMachine())
         machine.state
             .onEach {
                 _state.emit(it)
             }
             .launchIn(presenterScope)
+
+        machine.effects
+            .onEach {
+                _singleEffect.emit(it)
+            }.launchIn(presenterScope)
     }
 
-    protected open suspend fun initAction(state: S) {
-
-    }
-
-    suspend fun sendSingleEffect(effect: E){
-        _singleEffect.emit(effect)
-    }
+    protected open suspend fun initAction(state: S) = Unit
 
     final override fun clear() {
         presenterScope.cancel()

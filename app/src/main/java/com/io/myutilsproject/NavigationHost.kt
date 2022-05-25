@@ -65,7 +65,7 @@ fun RootComposeBuilder.generateGraph() {
 
         SecondScreen(
             state = state.value,
-            inc = { secondPresenter.inc(state.value.count + 1) },
+            inc = { secondPresenter.inc(state.value.count) },
             open = {
                 controller.push(
                     screen = Screens.ThirdScreen.route,
@@ -84,7 +84,7 @@ fun RootComposeBuilder.generateGraph() {
 
         TripleScreen(
             state = state.value,
-            inc = { thirdPresenter.inc(state.value.count + 1) },
+            inc = { thirdPresenter.inc(state.value.count) },
             backToFirst = {
                 controller.backToScreenWithPresenter(Screens.FirstScreen.route)
             }

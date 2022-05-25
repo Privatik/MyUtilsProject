@@ -15,12 +15,11 @@ data class ThirdState(
 
 class ThirdPresenter @Inject constructor(): Presenter<ThirdState, Any, Any>(ThirdState()) {
 
-    override val buildMachine: MachineDSL<ThirdState, Any>.() -> Unit = {
+    override fun buildMachine(): MachineDSL<ThirdState, Any>.() -> Unit = {
         onEach(
             everyFlow = incFlow,
             updateState = { oldState, payload -> oldState.copy(count = payload) }
         )
     }
-
 
 }
