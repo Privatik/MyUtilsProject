@@ -18,11 +18,14 @@ sealed class SecondEffect{
 
 class SecondPresenter @Inject constructor(): Presenter<SecondState, Any , SecondEffect>(SecondState()) {
 
-    override val buildMachine: MachineDSL<SecondState, SecondEffect>.() -> Unit = {
+    override fun buildMachine(): MachineDSL<SecondState, SecondEffect>.() -> Unit = {
         onEach(
             everyFlow = incFlow,
-            updateState = { oldState, payload -> oldState.copy(count = payload) },
+            updateState = { oldState, payload ->
+                oldState.copy(count = payload)
+                          },
             effect = { _, _, payload ->
+                println("Machine $payload")
                 if (payload % 10 == 0 && payload != 0){
                     SecondEffect.Snack("Ten")
                 } else {

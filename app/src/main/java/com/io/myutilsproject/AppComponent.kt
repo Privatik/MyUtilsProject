@@ -14,18 +14,14 @@ import kotlin.reflect.KClass
 
 @Component(modules = [AppModule::class])
 @Singleton
-interface AppComponent: PresenterDeps {
-    override val factory: MyPresenterFactory
+interface AppComponent{
+    val factory: MyPresenterFactory
 
     @Component.Builder
     interface Builder {
 
         fun build(): AppComponent
     }
-}
-
-interface PresenterDeps{
-    val factory: PresenterFactory
 }
 
 @Component(modules = [NextModule::class])
@@ -44,15 +40,15 @@ interface NextComponent {
 interface AppModule{
 
     @Multibinds
-    fun provideEmptyPresenters(): Map<Class<out Presenter>, Presenter>
+    fun provideEmptyPresenters(): Map<Class<out Presenter<*,*,*>>, Presenter<*,*,*>>
 
     @Binds
     @[IntoMap PresenterKey(FirstPresenter::class)]
-    fun provideFirstPresenter(firstPresenter: FirstPresenter): Presenter
+    fun provideFirstPresenter(firstPresenter: FirstPresenter): Presenter<*,*,*>
 
     @Binds
     @[IntoMap PresenterKey(SecondPresenter::class)]
-    fun provideSecondPresenter(secondPresenter: SecondPresenter): Presenter
+    fun provideSecondPresenter(secondPresenter: SecondPresenter): Presenter<*,*,*>
 }
 
 @Module
@@ -60,7 +56,7 @@ interface NextModule{
 
     @Binds
     @[IntoMap PresenterKey(ThirdPresenter::class)]
-    fun provideFirstPresenter(thirdPresenter: ThirdPresenter): Presenter
+    fun provideFirstPresenter(thirdPresenter: ThirdPresenter): Presenter<*,*,*>
 }
 
 @MustBeDocumented
@@ -71,4 +67,4 @@ annotation class NextScope
 @Target(AnnotationTarget.FUNCTION)
 @kotlin.annotation.Retention(AnnotationRetention.RUNTIME)
 @MapKey
-annotation class PresenterKey(val value: KClass<out Presenter>)
+annotation class PresenterKey(val value: KClass<out Presenter<*,*,*>>)

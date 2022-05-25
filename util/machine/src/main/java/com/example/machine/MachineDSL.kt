@@ -26,13 +26,13 @@ class MachineDSL<S: Any, E: Any> internal constructor(){
         updateState: RenderState<S, P>? = null,
         action: DoAction<S, P>? = null
     ){
-        val transaction = TransactionAction<S,P>(everyFlow).apply {
-            state(updateState)
-            action(action)
-        }
+        val transaction = TransactionAction(
+            everyFlow,
+            updateState,
+            action
+        )
         transactions.add(transaction)
     }
-
 
     @JvmName("onEachEffect")
     fun <P: Any> onEach(
@@ -40,10 +40,11 @@ class MachineDSL<S: Any, E: Any> internal constructor(){
         updateState: RenderState<S, P>? = null,
         effect: GetEffect<S, P, E>? = null
     ){
-        val transaction = TransactionGetEffect<S,P,E>(everyFlow).apply {
-            state(updateState)
-            effect(effect)
-        }
+        val transaction = TransactionGetEffect(
+            everyFlow,
+            updateState,
+            effect
+        )
         transactions.add(transaction)
     }
 }
