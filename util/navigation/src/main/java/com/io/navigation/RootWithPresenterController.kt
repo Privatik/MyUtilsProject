@@ -1,15 +1,10 @@
 package com.io.navigation
 
 import androidx.compose.ui.graphics.Color
-import ru.alexgladkov.odyssey.compose.AllowedDestination
 import ru.alexgladkov.odyssey.compose.RootController
 import ru.alexgladkov.odyssey.compose.RootControllerType
-import ru.alexgladkov.odyssey.core.LaunchFlag
-import ru.alexgladkov.odyssey.core.animations.AnimationType
-import ru.alexgladkov.odyssey.core.animations.defaultPresentationAnimation
-import ru.alexgladkov.odyssey.core.animations.defaultPushAnimation
-import ru.alexgladkov.odyssey.core.screen.Screen
 import java.util.*
+import kotlin.collections.HashSet
 
 class RootWithPresenterController(
     startPresenterFactory: () -> PresenterFactory = ::emptyPresenter,
@@ -20,8 +15,11 @@ class RootWithPresenterController(
     private val currentScreenKey: String
          get() = currentScreen.value.screen.key
 
-    private val presenterExitsMap = hashMapOf<Class<out UIPresenter>, UIPresenter>()
-    private val screenWithPresenterMap = hashMapOf<String, MutableList<Class<out UIPresenter>>>()
+    private val sharedPresenters = hashMapOf<Class<out UIPresenter>, SharedPresenterBody>()
+    private val sharedScreenWithSharedPresenter = hashMapOf<String, HashSet<Class<out UIPresenter>>>()
+
+    private val screenWithPresenterMap = hashMapOf<String, MutableList<PresenterBody>>()
+
     private val screensKeys = Stack<ScreenInfo>()
 
     private var currentPresenterFactory: PresenterFactory = startPresenterFactory.invoke()
@@ -36,73 +34,14 @@ class RootWithPresenterController(
         screenWithPresenterMap[screenInfo.screen] = mutableListOf()
     }
 
-    fun launch(
-        screen: String,
-        startScreen: String? = null,
-        startTabPosition: Int = 0,
-        params: Any? = null,
-        animationType: AnimationType = AnimationType.None,
-        launchFlag: LaunchFlag? = null,
-        presenterFactory: (() -> PresenterFactory)? = null
-    ) {
-
-        if (presenterFactory != null){
-
-            val screenInfo = ScreenInfo(
-                screen = currentScreenKey,
-                presenterFactory = presenterFactory
-            )
-
-            screensKeys.push(screenInfo)
-
-            updateFactoryForPresenter(presenterFactory.invoke())
-        }
-
-        launch(
-            screen = screen,
-            startScreen = startScreen,
-            startTabPosition = startTabPosition,
-            params = params,
-            animationType = animationType,
-            launchFlag = launchFlag,
-            deepLink = false
+    internal fun updateFactory(factory: () -> PresenterFactory){
+        val screenInfo = ScreenInfo(
+            screen = currentScreenKey,
+            presenterFactory = factory
         )
-    }
 
-    fun present(
-        screen: String,
-        startTabPosition: Int = 0,
-        startScreen: String? = null,
-        params: Any? = null,
-        launchFlag: LaunchFlag? = null,
-        presenterFactory: (() -> PresenterFactory)? = null
-    ) {
-        launch(
-            screen = screen,
-            startScreen = startScreen,
-            startTabPosition = startTabPosition,
-            params = params,
-            animationType = defaultPresentationAnimation(),
-            launchFlag = launchFlag,
-            presenterFactory = presenterFactory
-        )
-    }
-
-    fun push(
-        screen: String,
-        params: Any? = null,
-        launchFlag: LaunchFlag? = null,
-        presenterFactory: (() -> PresenterFactory)? = null
-    ) {
-        launch(
-            screen = screen,
-            startScreen = null,
-            startTabPosition = 0,
-            params = params,
-            animationType = defaultPushAnimation(),
-            launchFlag = launchFlag,
-            presenterFactory = presenterFactory
-        )
+        screensKeys.push(screenInfo)
+        updateFactoryForPresenter(factory.invoke())
     }
 
     fun backToScreenWithPresenter(screen: String){
@@ -139,13 +78,6 @@ class RootWithPresenterController(
         }
     }
 
-    private fun getBackStack(): List<Screen>{
-        val backstackField = RootController::class.java.getDeclaredField("_backstack")
-        backstackField.isAccessible = true
-        @Suppress("UNCHECKED_CAST")
-        return backstackField.get(this) as MutableList<Screen>
-    }
-
     private fun updateFactoryForPresenter(factory: PresenterFactory?){
         if (factory == null) return
         if (currentPresenterFactory == factory) return
@@ -153,9 +85,18 @@ class RootWithPresenterController(
     }
 
     private fun stopWorkPresenter(screen: String){
-        screenWithPresenterMap.remove(screen)?.forEach { clazzPresenter ->
-            val presenter = presenterExitsMap.remove(clazzPresenter)
-            presenter?.clear()
+        screenWithPresenterMap.remove(screen)?.forEach { presenterBody ->
+            presenterBody.presenter.clear()
+        }
+
+        sharedScreenWithSharedPresenter.remove(screen)?.forEach {
+            val sharedBody = sharedPresenters[it]!!
+            if (sharedBody.count == 1){
+                val presenter = sharedPresenters.remove(it)!!
+                presenter.presenter.clear()
+            } else {
+                sharedPresenters[it] = sharedBody.copy(count = sharedBody.count - 1)
+            }
         }
     }
 
@@ -175,17 +116,50 @@ class RootWithPresenterController(
         }
     }
 
-    fun <P : UIPresenter> createPresenter(
+    internal fun <P: UIPresenter> createPresenter(
+        clazz: Class<out UIPresenter>,
+        isShared: Boolean
+    ): P {
+        return if (isShared) getSharedPresenter(clazz) else getPresenter(clazz)
+    }
+
+    private fun <P: UIPresenter> getSharedPresenter(
         clazz: Class<out UIPresenter>
     ): P {
-        if (presenterExitsMap.containsKey(clazz)){
+        if (sharedPresenters.containsKey(clazz)){
+            val sharedPresenter = sharedPresenters[clazz]!!
+            val screenWithSharedPresenter = sharedScreenWithSharedPresenter[currentScreenKey]!!
+            if (!screenWithSharedPresenter.contains(clazz)){
+                sharedPresenters[clazz] = sharedPresenter.copy(count = sharedPresenter.count + 1)
+            }
+
             @Suppress("UNCHECKED_CAST")
-            return presenterExitsMap[clazz]!! as P
+            return sharedPresenter.presenter as P
         } else {
             val presenter = currentPresenterFactory.create<P>(clazz)
-            checkOnNullPresenterMap()
-            screenWithPresenterMap[currentScreenKey]?.apply { add(clazz) }
-            presenterExitsMap[clazz] = presenter
+            sharedPresenters[clazz] = SharedPresenterBody(presenter = presenter)
+
+            return presenter
+        }
+    }
+
+    private fun <P: UIPresenter> getPresenter(
+        clazz: Class<out UIPresenter>
+    ): P {
+        checkOnNullPresenterMap()
+        val currentListPresenters = screenWithPresenterMap[currentScreenKey]!!
+
+        val currentPresenter = currentListPresenters.findLast { it.clazz == clazz }
+        if (currentPresenter != null){
+            @Suppress("UNCHECKED_CAST")
+            return currentPresenter.presenter as P
+        } else {
+            val presenter = currentPresenterFactory.create<P>(clazz)
+            val presenterBody = PresenterBody(
+                clazz = clazz,
+                presenter = presenter
+            )
+            screenWithPresenterMap[currentScreenKey]!!.apply { add(presenterBody) }
             return presenter
         }
     }
