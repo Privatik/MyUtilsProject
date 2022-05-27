@@ -9,7 +9,7 @@ fun emptyPresenter(): PresenterFactory{
 
 
 internal fun RootController.getBackStack(): List<Screen>{
-    val backstackField = javaClass.getDeclaredField("_backstack")
+    val backstackField = RootController::class.java.getDeclaredField("_backstack")
     backstackField.isAccessible = true
     @Suppress("UNCHECKED_CAST")
     return backstackField.get(this) as MutableList<Screen>
