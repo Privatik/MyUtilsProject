@@ -3,6 +3,7 @@ package com.io.myutilsproject.screens.third
 import androidx.compose.runtime.Stable
 import com.example.machine.MachineDSL
 import com.io.myutilsproject.Presenter
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -15,11 +16,20 @@ data class ThirdState(
 
 class ThirdPresenter @Inject constructor(): Presenter<ThirdState, Any, Any>(ThirdState()) {
 
-    override fun buildMachine(): MachineDSL<ThirdState, Any>.() -> Unit = {
+    private val inc = MutableSharedFlow<Int>()
+
+    fun inc(count: Int){
+        presenterScope.launch {
+            inc.emit(count + 1)
+        }
+    }
+
+    override fun machine(): MachineDSL<ThirdState, Any>.() -> Unit = {
         onEach(
-            everyFlow = incFlow,
+            everyFlow = inc,
             updateState = { oldState, payload -> oldState.copy(count = payload) }
         )
     }
+
 
 }

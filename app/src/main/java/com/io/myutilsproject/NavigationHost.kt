@@ -10,6 +10,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.io.myutilsproject.screens.first.FirstPresenter
 import com.io.myutilsproject.screens.first.FirstScreen
 import com.io.myutilsproject.screens.second.SecondEffect
 import com.io.myutilsproject.screens.second.SecondPresenter
@@ -32,6 +33,7 @@ fun RootComposeBuilder.generateGraph() {
         name = Screens.FirstScreen.route,
     ) {
         val controller = LocalRootController.current.asPresenterController()
+        val firstPresenter: FirstPresenter = presenter()
         FirstScreen{
             controller.push(Screens.SecondScreen.route)
         }
@@ -66,6 +68,7 @@ fun RootComposeBuilder.generateGraph() {
         SecondScreen(
             state = state.value,
             inc = { secondPresenter.inc(state.value.count) },
+            incGod = { secondPresenter.incGod(state.value.godCount) },
             open = {
                 controller.push(
                     screen = Screens.ThirdScreen.route,

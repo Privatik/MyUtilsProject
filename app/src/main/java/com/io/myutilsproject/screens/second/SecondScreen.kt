@@ -22,6 +22,7 @@ import ru.alexgladkov.odyssey.compose.local.LocalRootController
 fun SecondScreen(
     state: SecondState,
     inc: () -> Unit,
+    incGod: () -> Unit,
     open: () -> Unit
 ){
     val currentConfig = LocalConfiguration.current
@@ -33,8 +34,10 @@ fun SecondScreen(
     ) {
         if (currentConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
             Text(text = "Second screen LANDSCAPE ${state.count}")
+            Text(text = "Second screen GOD LANDSCAPE ${state.godCount}")
         } else {
             Text(text = "Second screen PORTSCAPE ${state.count}")
+            Text(text = "Second screen GOD PORTSCAPE ${state.godCount}")
         }
         Button(onClick = { open() }) {
             Text(text = "Open")
@@ -42,6 +45,8 @@ fun SecondScreen(
         Button(onClick = { inc() }) {
             Text(text = "Inc")
         }
-
+        Button(onClick = { incGod() }) {
+            Text(text = "Inc God")
+        }
     }
 }
