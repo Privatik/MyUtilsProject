@@ -4,7 +4,6 @@ import androidx.compose.ui.graphics.Color
 import ru.alexgladkov.odyssey.compose.RootController
 import ru.alexgladkov.odyssey.compose.RootControllerType
 import java.util.*
-import kotlin.collections.HashSet
 
 class RootWithPresenterController(
     startPresenterFactory: () -> PresenterFactory = ::emptyPresenter,
@@ -27,7 +26,7 @@ class RootWithPresenterController(
     init {
         val screenInfo = ScreenInfo(
             screen = "",
-            presenterFactory = startPresenterFactory
+            presenterFactory = currentPresenterFactory
         )
 
         screensKeys.push(screenInfo)
@@ -35,13 +34,15 @@ class RootWithPresenterController(
     }
 
     internal fun updateFactory(factory: () -> PresenterFactory){
+        val factoryInstance = factory.invoke()
+
         val screenInfo = ScreenInfo(
             screen = currentScreenKey,
-            presenterFactory = factory
+            presenterFactory = factoryInstance
         )
 
         screensKeys.push(screenInfo)
-        updateFactoryForPresenter(factory.invoke())
+        updateFactoryForPresenter(factoryInstance)
     }
 
     fun backToScreenWithPresenter(screen: String){
@@ -63,7 +64,7 @@ class RootWithPresenterController(
         while (!isFind){
             if (screensKeys.size == 1){
                 val screenInfo = screensKeys.peek()
-                updateFactoryForPresenter(screenInfo.presenterFactory())
+                updateFactoryForPresenter(screenInfo.presenterFactory)
                 break
             }
 
@@ -72,7 +73,7 @@ class RootWithPresenterController(
             stopWorkPresenter(screenInfo.screen)
 
             if (currentScreen != null){
-                updateFactoryForPresenter(screenInfo.presenterFactory())
+                updateFactoryForPresenter(screenInfo.presenterFactory)
                 isFind = true
             }
         }
@@ -103,16 +104,10 @@ class RootWithPresenterController(
     private fun removeLastScreenWithPresenters(){
         val screen = screensKeys.peek()
         if (screen.screen == currentScreenKey || screensKeys.size == 1){
-            updateFactoryForPresenter(screen.presenterFactory.invoke())
+            updateFactoryForPresenter(screen.presenterFactory)
             if (screensKeys.size != 1){
                 screensKeys.pop()
             }
-        }
-    }
-
-    private fun checkOnNullPresenterMap(){
-        if (screenWithPresenterMap[currentScreenKey] == null){
-            screenWithPresenterMap[currentScreenKey] = mutableListOf()
         }
     }
 
@@ -138,7 +133,7 @@ class RootWithPresenterController(
         } else {
             val presenter = currentPresenterFactory.create<P>(clazz)
             sharedPresenters[clazz] = SharedPresenterBody(presenter = presenter)
-
+            presenter.build()
             return presenter
         }
     }
@@ -146,8 +141,10 @@ class RootWithPresenterController(
     private fun <P: UIPresenter> getPresenter(
         clazz: Class<out UIPresenter>
     ): P {
-        checkOnNullPresenterMap()
-        val currentListPresenters = screenWithPresenterMap[currentScreenKey]!!
+        val currentListPresenters = screenWithPresenterMap.initializeOrGet(
+            currentScreenKey,
+            mutableListOf()
+        )
 
         val currentPresenter = currentListPresenters.findLast { it.clazz == clazz }
         if (currentPresenter != null){
@@ -160,6 +157,7 @@ class RootWithPresenterController(
                 presenter = presenter
             )
             screenWithPresenterMap[currentScreenKey]!!.apply { add(presenterBody) }
+            presenter.build()
             return presenter
         }
     }

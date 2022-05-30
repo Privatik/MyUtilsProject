@@ -3,27 +3,49 @@ package com.io.myutilsproject.screens.second
 import androidx.compose.runtime.Stable
 import com.example.machine.MachineDSL
 import com.io.myutilsproject.Presenter
+import com.io.myutilsproject.repository.FirstRepository
+import com.io.myutilsproject.repository.SecondRepository
+import com.io.myutilsproject.repository.ThirdRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @Stable
 data class SecondState(
-    val count: Int = 0
+    val count: Int = 0,
+    val godCount: Int
 )
 
 sealed class SecondEffect{
     data class Snack(val message: String): SecondEffect()
 }
 
-class SecondPresenter @Inject constructor(): Presenter<SecondState, Any , SecondEffect>(SecondState()) {
+class SecondPresenter @Inject constructor(
+    private val firstRepository: FirstRepository,
+    private val secondRepository: SecondRepository,
+): Presenter<SecondState, Any, SecondEffect>(SecondState(godCount = firstRepository.staterInc)) {
 
-    override fun buildMachine(): MachineDSL<SecondState, SecondEffect>.() -> Unit = {
+    private val inc = MutableSharedFlow<Int>()
+    private val incGod = MutableSharedFlow<Int>()
+
+    fun inc(count: Int){
+        presenterScope.launch {
+            inc.emit(count + 1)
+        }
+    }
+
+    fun incGod(count: Int){
+        presenterScope.launch {
+            incGod.emit(count + 1)
+        }
+    }
+
+    override fun machine(): MachineDSL<SecondState, SecondEffect>.() -> Unit = {
         onEach(
-            everyFlow = incFlow,
+            everyFlow = inc,
             updateState = { oldState, payload ->
                 oldState.copy(count = payload)
-                          },
+            },
             effect = { _, _, payload ->
                 println("Machine $payload")
                 if (payload % 10 == 0 && payload != 0){
@@ -31,6 +53,20 @@ class SecondPresenter @Inject constructor(): Presenter<SecondState, Any , Second
                 } else {
                     null
                 }
+            }
+        )
+
+        onEach(
+            everyFlow = incGod,
+            action = { _, _, payload ->
+                firstRepository.inc(payload)
+            }
+        )
+
+        onEach(
+            everyFlow = firstRepository.incFlow,
+            updateState = { oldState, payload ->
+                oldState.copy(godCount = payload)
             }
         )
     }

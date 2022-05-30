@@ -2,11 +2,16 @@ package com.io.myutilsproject.screens.first
 
 import com.example.machine.MachineDSL
 import com.io.myutilsproject.Presenter
+import com.io.myutilsproject.repository.FirstRepository
+import com.io.myutilsproject.repository.SecondRepository
 import javax.inject.Inject
 
-class FirstPresenter @Inject constructor(): Presenter<Any, Any, Any>(Any()) {
+class FirstPresenter @Inject constructor(
+    private val firstRepository: FirstRepository,
+    private val secondRepository: SecondRepository,
+): Presenter<Any, Any, Any>(Any()) {
 
-    override fun buildMachine(): MachineDSL<Any, Any>.() -> Unit = {
+    override fun machine(): MachineDSL<Any, Any>.() -> Unit = {
 
     }
 }
