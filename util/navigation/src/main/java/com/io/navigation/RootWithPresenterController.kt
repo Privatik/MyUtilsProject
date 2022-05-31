@@ -123,7 +123,10 @@ class RootWithPresenterController(
     ): P {
         if (sharedPresenters.containsKey(clazz)){
             val sharedPresenter = sharedPresenters[clazz]!!
-            val screenWithSharedPresenter = sharedScreenWithSharedPresenter[currentScreenKey]!!
+            val screenWithSharedPresenter = sharedScreenWithSharedPresenter.initializeOrGet(
+                currentScreenKey,
+                hashSetOf()
+            )
             if (!screenWithSharedPresenter.contains(clazz)){
                 sharedPresenters[clazz] = sharedPresenter.copy(count = sharedPresenter.count + 1)
             }
@@ -133,6 +136,8 @@ class RootWithPresenterController(
         } else {
             val presenter = currentPresenterFactory.create<P>(clazz)
             sharedPresenters[clazz] = SharedPresenterBody(presenter = presenter)
+            val clazzSet = hashSetOf(clazz)
+            sharedScreenWithSharedPresenter[currentScreenKey] = clazzSet
             presenter.build()
             return presenter
         }

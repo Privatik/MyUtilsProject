@@ -17,7 +17,8 @@ import androidx.compose.ui.platform.LocalConfiguration
 fun TripleScreen(
     state: ThirdState,
     inc: () -> Unit,
-    backToFirst: () -> Unit
+    backToFirst: () -> Unit,
+    next: () -> Unit
 ){
     val currentConfig = LocalConfiguration.current
     Column(
@@ -32,7 +33,10 @@ fun TripleScreen(
             Text(text = "Second screen PORTSCAPE ${state.count}")
         }
         Button(onClick = { backToFirst() }) {
-
+            Text(text = "Back")
+        }
+        Button(onClick = { next() }) {
+            Text(text = "Next")
         }
     }
 }

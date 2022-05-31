@@ -32,5 +32,16 @@ fun RootComposeBuilder.buildWithPresenter(
 }
 
 fun RootController.asPresenterController(): RootWithPresenterController{
-    return this as RootWithPresenterController
+    if (this is RootWithPresenterController){
+        return this
+    } else {
+        var currentController: RootController? = parentRootController
+        while (currentController != null){
+            if (currentController is RootWithPresenterController){
+                return currentController
+            }
+            currentController = currentController.parentRootController
+        }
+    }
+    throw ClassCastException("Error planing")
 }

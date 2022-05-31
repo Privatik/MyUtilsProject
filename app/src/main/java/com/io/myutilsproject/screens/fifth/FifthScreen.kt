@@ -12,6 +12,7 @@ fun FifthScreen(
     inc: () -> Unit,
 ){
     Column() {
+        Text("FifthScreen")
         Text("state ${state.count}")
         Button(onClick = { inc() }) {
 
