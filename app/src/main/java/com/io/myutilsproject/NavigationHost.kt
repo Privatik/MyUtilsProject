@@ -10,19 +10,19 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.io.myutilsproject.screens.fifth.FifthScreen
 import com.io.myutilsproject.screens.first.FirstPresenter
 import com.io.myutilsproject.screens.first.FirstScreen
 import com.io.myutilsproject.screens.second.SecondEffect
 import com.io.myutilsproject.screens.second.SecondPresenter
 import com.io.myutilsproject.screens.second.SecondScreen
+import com.io.myutilsproject.screens.sixth.SixthScreen
 import com.io.myutilsproject.screens.third.ThirdPresenter
 import com.io.myutilsproject.screens.third.TripleScreen
 import com.io.navigation.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import ru.alexgladkov.odyssey.compose.extensions.present
-import ru.alexgladkov.odyssey.compose.extensions.push
-import ru.alexgladkov.odyssey.compose.extensions.screen
+import ru.alexgladkov.odyssey.compose.extensions.*
 import ru.alexgladkov.odyssey.compose.local.LocalRootController
 import ru.alexgladkov.odyssey.compose.navigation.RootComposeBuilder
 
@@ -90,8 +90,41 @@ fun RootComposeBuilder.generateGraph() {
             inc = { thirdPresenter.inc(state.value.count) },
             backToFirst = {
                 controller.backToScreenWithPresenter(Screens.FirstScreen.route)
+            },
+            next = {
+                controller.present(
+                    screen = Screens.FourScreen.route,
+                    startScreen = Screens.FifthScreen.route
+                )
             }
         )
+    }
+
+    bottomNavigation(name = Screens.FourScreen.route, tabsNavModel = BottomConfiguration()) {
+        tab(FifthTab()) {
+            screen(name = Screens.FifthScreen.route) {
+                val thirdPresenter: ThirdPresenter = sharedPresenter()
+                val state = thirdPresenter.state.collectAsState()
+
+                FifthScreen(
+                    state = state.value,
+                    inc = { thirdPresenter.inc(state.value.count) }
+                )
+            }
+        }
+
+        tab(SixthTab()) {
+            screen(name = Screens.SixthScreen.route) {
+                val thirdPresenter: ThirdPresenter = sharedPresenter()
+                val state = thirdPresenter.state.collectAsState()
+
+                SixthScreen(
+                    state = state.value,
+                    inc = { thirdPresenter.inc(state.value.count) }
+                )
+            }
+
+        }
     }
 }
 
@@ -99,4 +132,7 @@ sealed class Screens(val route: String){
     object FirstScreen: Screens("first")
     object SecondScreen: Screens("second")
     object ThirdScreen: Screens("triple")
+    object FourScreen: Screens("four")
+    object FifthScreen: Screens("fifth")
+    object SixthScreen: Screens("sixth")
 }
