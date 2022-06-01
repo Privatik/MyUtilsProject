@@ -1,7 +1,7 @@
 package com.io.navigation
 
-internal data class ScreenInfo(
-    val screen: String,
+internal data class ScreenInfo<Key: Any>(
+    val screen: Key,
     val presenterFactory: PresenterFactory
 )
 

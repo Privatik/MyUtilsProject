@@ -1,4 +1,3 @@
-
 plugins{
     id("kotlin-android")
     id("com.android.library")
@@ -27,8 +26,4 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.4.1")
     implementation("androidx.activity:activity-compose:1.4.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.10"  )
-
-    api("io.github.alexgladkov:odyssey-core:1.0.0-beta03")
-    api("io.github.alexgladkov:odyssey-compose:1.0.0-beta03")
-
 }

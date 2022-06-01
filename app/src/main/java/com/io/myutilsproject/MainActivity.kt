@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.navigation.compose.rememberNavController
 import com.io.navigation.buildWithPresenter
 import ru.alexgladkov.odyssey.compose.base.Navigator
 import ru.alexgladkov.odyssey.compose.extensions.setupWithActivity
@@ -18,9 +19,8 @@ class MainActivity : ComponentActivity() {
 
         val rootController = RootComposeBuilder()
             .apply { generateGraph() }
-            .buildWithPresenter(
-                presenterFactory = ::createAppComponent
-            )
+            .build()
+
         rootController.setupWithActivity(this)
 
         setContent {
