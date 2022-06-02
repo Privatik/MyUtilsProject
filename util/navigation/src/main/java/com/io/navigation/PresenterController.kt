@@ -14,7 +14,7 @@ internal class PresenterController<Key: Any>() {
     private var currentPresenterFactory: PresenterFactory by Delegates.notNull()
 
 
-    internal fun updateFactory(
+    fun updateFactory(
         key: Key,
         factory: () -> PresenterFactory
     ){
@@ -34,21 +34,30 @@ internal class PresenterController<Key: Any>() {
         currentPresenterFactory = factory
     }
 
-    fun popBackStack() {
-        stopWorkPresenter(currentScreenKey)
-        super.popBackStack()
-        removeLastScreenWithPresenters()
+    fun popBackStack(key: Key, pop:() -> List<Key>) {
+        stopWorkPresenter(key)
+        val backstack = pop()
+        deleteUnnecessaryFactory(backstack)
     }
 
-    fun backToScreenWithPresenter(screen: String){
-        stopWorkPresenter(currentScreenKey)
-        backToScreen(screen)
-        deleteUnnecessaryFactory()
+    private fun stopWorkPresenter(key: Key){
+        screenWithPresenterMap.remove(key)?.forEach { presenterBody ->
+            presenterBody.presenter.clear()
+        }
+
+        sharedScreenWithSharedPresenter.remove(key)?.forEach {
+            val sharedBody = sharedPresenters[it]!!
+            if (sharedBody.count == 1){
+                val presenter = sharedPresenters.remove(it)!!
+                presenter.presenter.clear()
+            } else {
+                sharedPresenters[it] = sharedBody.copy(count = sharedBody.count - 1)
+            }
+        }
     }
 
-    private fun deleteUnnecessaryFactory(){
-        val backstack = getBackStack()
 
+    private fun deleteUnnecessaryFactory(backStack: List<Key>){
         var isFind = false
         while (!isFind){
             if (screensKeys.size == 1){
@@ -58,22 +67,12 @@ internal class PresenterController<Key: Any>() {
             }
 
             val screenInfo = screensKeys.pop()
-            val currentScreen = backstack.findLast { it.key == screenInfo.screen }
+            val currentScreen = backStack.findLast { it == screenInfo.screen }
             stopWorkPresenter(screenInfo.screen)
 
             if (currentScreen != null){
                 updateFactoryForPresenter(screenInfo.presenterFactory)
                 isFind = true
-            }
-        }
-    }
-
-    private fun removeLastScreenWithPresenters(){
-        val screen = screensKeys.peek()
-        if (screen.screen == currentScreenKey || screensKeys.size == 1){
-            updateFactoryForPresenter(screen.presenterFactory)
-            if (screensKeys.size != 1){
-                screensKeys.pop()
             }
         }
     }

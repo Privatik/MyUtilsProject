@@ -1,35 +1,44 @@
 package com.io.myutilsproject
 
-import androidx.compose.runtime.Composable
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.io.navigation.AdapterPresenter
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
 import ru.alexgladkov.odyssey.compose.RootController
-import ru.alexgladkov.odyssey.core.NavConfiguration
+import ru.alexgladkov.odyssey.core.screen.Screen
+import ru.alexgladkov.odyssey.core.screen.ScreenInteractor
 
 class OdesseyPresenter(
     controller: RootController
-): AdapterPresenter<NavConfiguration, RootController>(controller) {
-    override val currentScreen: Flow<NavConfiguration> = controller.currentScreen
+): AdapterPresenter<ScreenInteractor, RootController>(controller) {
 
-    override fun getBackStack(): List<NavConfiguration> {
-        return emptyList()
+    override fun getBackStack(): List<ScreenInteractor> {
+        return backStack()
     }
 
+    private fun backStack(): List<ScreenInteractor>{
+        val backStack = RootController::class.java.getDeclaredField("_backstack")
+        backStack.isAccessible = true
+
+        @Suppress("UNCHECKED_CAST")
+        return backStack.get(controller) as List<Screen>
+    }
+
+    override fun getCurrentScreen(): ScreenInteractor {
+        return controller.currentScreen.value.screen
+    }
 
 
 }
 
 class GooglePresenter(
-    controller: NavHostController
+    controller: NavHostController,
 ): AdapterPresenter<NavBackStackEntry, NavHostController>(controller) {
-    override val currentScreen: Flow<NavBackStackEntry> = controller.currentBackStackEntryFlow
 
     override fun getBackStack(): List<NavBackStackEntry> {
-        return emptyList()
+        return controller.backQueue
+    }
+
+    override fun getCurrentScreen(): NavBackStackEntry {
+        return controller.currentBackStackEntry!!
     }
 }
