@@ -3,79 +3,36 @@ package com.io.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import kotlinx.coroutines.flow.*
+import java.util.*
+
 
 abstract class AdapterPresenter<Key: Any,Controller>(
-    private val controller: Controller,
+    protected val controller: Controller,
     startPresenterFactory: () -> PresenterFactory = ::emptyPresenter
 ) {
     private val presenterController = PresenterController<Key>()
-    abstract val currentScreen: Flow<Key>
 
-    @Composable
-    private fun ListenerChangeState(){
-        LaunchedEffect(Unit){
-            currentScreen
-                .onEach {
-                    presenterController.updateFactory(it)
-                }
-                .launchIn(this)
-        }
-    }
-
-
+    abstract fun getCurrentScreen(): Key
     protected abstract fun getBackStack(): List<Key>
 
-    final fun <P: UIPresenter> createPresenter(
+    fun <P: UIPresenter> createPresenter(
         clazz: Class<out UIPresenter>,
         isShared: Boolean
     ): P {
         return if (isShared)
-            presenterController.getSharedPresenter(clazz)
+            presenterController.getSharedPresenter(
+                key = getCurrentScreen(),
+                clazz = clazz
+            )
         else
-            presenterController.getPresenter(clazz)
+            presenterController.getPresenter(
+                key = getCurrentScreen(),
+                clazz = clazz
+            )
     }
 
-    fun popBackStack() {
-        stopWorkPresenter(currentScreenKey)
-        super.popBackStack()
-        removeLastScreenWithPresenters()
+    internal fun updateFactory(factory: () -> PresenterFactory){
+        presenterController.updateFactory(getCurrentScreen(), factory)
     }
 
-    fun backToScreenWithPresenter(screen: String){
-        stopWorkPresenter(currentScreenKey)
-        backToScreen(screen)
-        deleteUnnecessaryFactory()
-    }
-
-    private fun deleteUnnecessaryFactory(){
-        val backstack = getBackStack()
-
-        var isFind = false
-        while (!isFind){
-            if (screensKeys.size == 1){
-                val screenInfo = screensKeys.peek()
-                updateFactoryForPresenter(screenInfo.presenterFactory)
-                break
-            }
-
-            val screenInfo = screensKeys.pop()
-            val currentScreen = backstack.findLast { it.key == screenInfo.screen }
-            stopWorkPresenter(screenInfo.screen)
-
-            if (currentScreen != null){
-                updateFactoryForPresenter(screenInfo.presenterFactory)
-                isFind = true
-            }
-        }
-    }
-
-    private fun removeLastScreenWithPresenters(){
-        val screen = screensKeys.peek()
-        if (screen.screen == currentScreenKey || screensKeys.size == 1){
-            updateFactoryForPresenter(screen.presenterFactory)
-            if (screensKeys.size != 1){
-                screensKeys.pop()
-            }
-        }
-    }
 }
