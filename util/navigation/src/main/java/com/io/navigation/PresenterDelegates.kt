@@ -2,7 +2,6 @@ package com.io.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import ru.alexgladkov.odyssey.compose.local.LocalRootController
 
 @Composable
 public inline fun <reified P: UIPresenter> presenter(): P {
@@ -19,10 +18,18 @@ public fun <P : UIPresenter> presenter(
     clazz: Class<out UIPresenter>,
     isShared: Boolean = false
 ): P {
-    checkNotNull(LocalRootController.current)
-    val controller = LocalRootController.current.asPresenterController()
+    checkNotNull(LocalPresenterOwnerController.current)
+    checkNotNull(LocalPresenterFactoryController.current)
+
+    val factory = LocalPresenterFactoryController.current
+    val owner = LocalPresenterOwnerController.current
 
     return remember {
-        controller.createPresenter(clazz, isShared)
+        if (isShared){
+            owner.createOrGetSharedPresenter<P>(clazz, factory)
+        } else {
+            val store = owner.createOrGetPresenterStore()
+            store.createOrGetPresenter<P>(clazz, factory)
+        }
     }
 }

@@ -32,7 +32,7 @@ fun RootComposeBuilder.generateGraph() {
     screen(
         name = Screens.FirstScreen.route,
     ) {
-        val controller = LocalRootController.current.asPresenterController()
+        val controller = LocalRootController.current
         val firstPresenter: FirstPresenter = presenter()
         FirstScreen{
             controller.push(Screens.SecondScreen.route)
@@ -42,7 +42,7 @@ fun RootComposeBuilder.generateGraph() {
     screen(
         name = Screens.SecondScreen.route,
     ){
-        val controller = LocalRootController.current.asPresenterController()
+        val controller = LocalRootController.current
         val secondPresenter: SecondPresenter = presenter()
         val state = secondPresenter.state.collectAsState()
         val snackbarHostState = remember {
@@ -71,9 +71,7 @@ fun RootComposeBuilder.generateGraph() {
             incGod = { secondPresenter.incGod(state.value.godCount) },
             open = {
                 controller.push(
-                    screen = Screens.ThirdScreen.route,
-                    presenterFactory = ::createNextComponent
-                )
+                    screen = Screens.ThirdScreen.route)
             }
         )
     }
@@ -81,7 +79,7 @@ fun RootComposeBuilder.generateGraph() {
     screen(
         name = Screens.ThirdScreen.route,
     ){
-        val controller = LocalRootController.current.asPresenterController()
+        val controller = LocalRootController.current
         val thirdPresenter: ThirdPresenter = presenter()
         val state = thirdPresenter.state.collectAsState()
 
@@ -89,7 +87,7 @@ fun RootComposeBuilder.generateGraph() {
             state = state.value,
             inc = { thirdPresenter.inc(state.value.count) },
             backToFirst = {
-                controller.backToScreenWithPresenter(Screens.FirstScreen.route)
+                controller.backToScreen(Screens.FirstScreen.route)
             },
             next = {
                 controller.present(
