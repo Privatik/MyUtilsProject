@@ -1,38 +1,15 @@
 package com.io.navigation
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import kotlinx.coroutines.flow.*
-import java.util.*
+import kotlinx.coroutines.CoroutineScope
 
 
 abstract class AdapterPresenter<Key: Any,Controller>(
     protected val controller: Controller,
-    startPresenterFactory: () -> PresenterFactory = ::emptyPresenter
 ) {
-    private val presenterController = PresenterController<Key>()
+    private val owner = PresenterStoreOwner<Key>()
 
-    abstract fun getCurrentScreen(): Key
-    protected abstract fun getBackStack(): List<Key>
+    abstract fun updateCurrentScreen(scope: CoroutineScope)
 
-    fun <P: UIPresenter> createPresenter(
-        clazz: Class<out UIPresenter>,
-        isShared: Boolean
-    ): P {
-        return if (isShared)
-            presenterController.getSharedPresenter(
-                key = getCurrentScreen(),
-                clazz = clazz
-            )
-        else
-            presenterController.getPresenter(
-                key = getCurrentScreen(),
-                clazz = clazz
-            )
-    }
-
-    internal fun updateFactory(factory: () -> PresenterFactory){
-        presenterController.updateFactory(getCurrentScreen(), factory)
-    }
+    fun updateScreen(key: Key) = owner.updateScreen(key)
 
 }

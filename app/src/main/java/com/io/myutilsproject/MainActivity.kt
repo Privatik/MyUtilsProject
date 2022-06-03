@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import ru.alexgladkov.odyssey.compose.base.Navigator
 import ru.alexgladkov.odyssey.compose.extensions.setupWithActivity
 import ru.alexgladkov.odyssey.compose.local.LocalRootController
@@ -24,6 +25,11 @@ class MainActivity : ComponentActivity() {
             CompositionLocalProvider(
                 LocalRootController provides rootController
             ) {
+
+                LaunchedEffect(Unit){
+                    val adapter = OdesseyPresenter(rootController)
+                    adapter.updateCurrentScreen(this)
+                }
 
                 ModalNavigator {
                     Navigator(Screens.FirstScreen.route)
