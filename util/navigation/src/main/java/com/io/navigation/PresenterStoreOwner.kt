@@ -1,44 +1,44 @@
 package com.io.navigation
 
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.properties.Delegates
 
-class PresenterStoreOwner<Key: Any> internal constructor(){
-    private val sharedPresenters = hashMapOf<Class<out UIPresenter>, SharedPresenterBody>()
-    private val sharedScreenWithSharedPresenter = hashMapOf<Key, HashSet<Class<out UIPresenter>>>()
+internal class PresenterStoreOwner<Key: Any>{
+    private val sharedPresenters = ConcurrentHashMap<Class<out UIPresenter>, SharedPresenterBody>()
+    private val sharedScreenWithSharedPresenter = ConcurrentHashMap<Key, HashSet<Class<out UIPresenter>>>()
 
-    private val stores = hashMapOf<Key, PresenterStore>()
+    private val stores = ConcurrentHashMap<Key, PresenterStore>()
     private val backStack = Stack<Key>()
 
     private var _currentKey: Key by Delegates.notNull()
     private val currentKey: Key
         get() = _currentKey
 
-    internal fun updateScreen(key: Key){
-        if (key == currentKey) return
-        val screenSet = stores.keys
-        if (screenSet.contains(key)){
-            deleteBackStackUntilKey(key)
-        } else {
-            addBackStack(key)
-        }
-    }
-
-    private fun addBackStack(key: Key){
-        val store = PresenterStore()
-        stores[key] = store
-        backStack.push(key)
+    fun updateScreen(key: Key){
         _currentKey = key
+        backStack.push(key)
     }
 
-    private fun deleteBackStackUntilKey(key: Key){
+    fun deleteBackStackUntilKey(){
         var screen = backStack.peek()
-        while (screen != key){
+        while (screen != currentKey){
             backStack.pop()
             stores[screen]!!.clear()
+
+            sharedScreenWithSharedPresenter[screen]?.forEach {
+                val sharedPresenter = sharedPresenters[it]!!
+
+                val count = sharedPresenter.count
+                if (count > 1){
+                    sharedPresenters.remove(it)!!.presenter.clear()
+                } else {
+                    sharedPresenters[it] = sharedPresenter.copy(count = count - 1)
+                }
+            }
+
             screen = backStack.peek()
         }
-        _currentKey = screen
     }
 
     fun <P: UIPresenter> createOrGetSharedPresenter(
@@ -68,6 +68,12 @@ class PresenterStoreOwner<Key: Any> internal constructor(){
     }
 
     fun createOrGetPresenterStore(): PresenterStore {
-        return stores[currentKey]!!
+        stores[currentKey]?.let {
+            return it
+        }
+        val store = PresenterStore()
+        stores[currentKey] = store
+
+        return store
     }
 }

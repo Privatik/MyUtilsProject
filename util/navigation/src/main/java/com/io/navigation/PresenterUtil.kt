@@ -4,14 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 
-internal val LocalPresenterOwnerController = compositionLocalOf<PresenterStoreOwner<*>> {
-    error("No root controller provider")
-}
-
-internal val LocalPresenterFactoryController = compositionLocalOf<PresenterFactory> {
-    error("No root controller provider")
-}
-
 fun emptyPresenter(): PresenterFactory{
     return EmptyPresenterFactory()
 }

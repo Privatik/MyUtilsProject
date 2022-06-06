@@ -16,8 +16,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val rootController = RootComposeBuilder()
-            .apply { generateGraph() }
+            .apply {
+                generateGraph()
+            }
             .build()
+
+        val adapter = OdesseyPresenter(rootController)
 
         rootController.setupWithActivity(this)
 
@@ -27,9 +31,9 @@ class MainActivity : ComponentActivity() {
             ) {
 
                 LaunchedEffect(Unit){
-                    val adapter = OdesseyPresenter(rootController)
-                    adapter.updateCurrentScreen(this)
+                    adapter.updateScreen()
                 }
+
 
                 ModalNavigator {
                     Navigator(Screens.FirstScreen.route)

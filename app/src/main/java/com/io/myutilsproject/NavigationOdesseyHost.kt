@@ -22,6 +22,7 @@ import com.io.myutilsproject.screens.third.TripleScreen
 import com.io.navigation.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import ru.alexgladkov.odyssey.compose.RootController
 import ru.alexgladkov.odyssey.compose.extensions.*
 import ru.alexgladkov.odyssey.compose.local.LocalRootController
 import ru.alexgladkov.odyssey.compose.navigation.RootComposeBuilder
@@ -32,94 +33,107 @@ fun RootComposeBuilder.generateGraph() {
     screen(
         name = Screens.FirstScreen.route,
     ) {
-        val controller = LocalRootController.current
-        val firstPresenter: FirstPresenter = presenter()
-        FirstScreen{
-            controller.push(Screens.SecondScreen.route)
+        UpdatePresenter(factory = ::createAppComponent) {
+            val controller = LocalRootController.current
+            val firstPresenter: FirstPresenter = presenter()
+            FirstScreen{
+                controller.push(Screens.SecondScreen.route)
+            }
         }
+
     }
 
     screen(
         name = Screens.SecondScreen.route,
     ){
-        val controller = LocalRootController.current
-        val secondPresenter: SecondPresenter = presenter()
-        val state = secondPresenter.state.collectAsState()
-        val snackbarHostState = remember {
-            SnackbarHostState()
-        }
+        UpdatePresenter(factory = ::createAppComponent) {
+            val controller = LocalRootController.current
+            val secondPresenter: SecondPresenter = presenter()
+            val state = secondPresenter.state.collectAsState()
+            val snackbarHostState = remember {
+                SnackbarHostState()
+            }
 
-        LaunchedEffect(Unit){
-            secondPresenter
-                .singleEffect
-                .onEach {
-                    when (it){
-                        is SecondEffect.Snack -> {
-                            snackbarHostState.showSnackbar(
-                                message = it.message,
-                                duration = SnackbarDuration.Long
-                            )
+            LaunchedEffect(Unit) {
+                secondPresenter
+                    .singleEffect
+                    .onEach {
+                        when (it) {
+                            is SecondEffect.Snack -> {
+                                snackbarHostState.showSnackbar(
+                                    message = it.message,
+                                    duration = SnackbarDuration.Long
+                                )
+                            }
                         }
                     }
-                }
-                .launchIn(this)
-        }
-
-        SecondScreen(
-            state = state.value,
-            inc = { secondPresenter.inc(state.value.count) },
-            incGod = { secondPresenter.incGod(state.value.godCount) },
-            open = {
-                controller.push(
-                    screen = Screens.ThirdScreen.route)
+                    .launchIn(this)
             }
-        )
+
+            SecondScreen(
+                state = state.value,
+                inc = { secondPresenter.inc(state.value.count) },
+                incGod = { secondPresenter.incGod(state.value.godCount) },
+                open = {
+                    controller.push(
+                        screen = Screens.ThirdScreen.route
+                    )
+                }
+            )
+        }
     }
 
     screen(
         name = Screens.ThirdScreen.route,
     ){
-        val controller = LocalRootController.current
-        val thirdPresenter: ThirdPresenter = presenter()
-        val state = thirdPresenter.state.collectAsState()
+        UpdatePresenter(factory = ::createNextComponent) {
+            val controller = LocalRootController.current
+            val thirdPresenter: ThirdPresenter = presenter()
+            val state = thirdPresenter.state.collectAsState()
 
-        TripleScreen(
-            state = state.value,
-            inc = { thirdPresenter.inc(state.value.count) },
-            backToFirst = {
-                controller.backToScreen(Screens.FirstScreen.route)
-            },
-            next = {
-                controller.present(
-                    screen = Screens.FourScreen.route,
-                    startScreen = Screens.FifthScreen.route
-                )
-            }
-        )
+            TripleScreen(
+                state = state.value,
+                inc = { thirdPresenter.inc(state.value.count) },
+                backToFirst = {
+                    controller.backToScreen(Screens.FirstScreen.route)
+                },
+                next = {
+                    controller.present(
+                        screen = Screens.FourScreen.route,
+                        startScreen = Screens.FifthScreen.route
+                    )
+                }
+            )
+        }
+
     }
 
     bottomNavigation(name = Screens.FourScreen.route, tabsNavModel = BottomConfiguration()) {
         tab(FifthTab()) {
             screen(name = Screens.FifthScreen.route) {
-                val thirdPresenter: ThirdPresenter = sharedPresenter()
-                val state = thirdPresenter.state.collectAsState()
+                UpdatePresenter(factory = ::createNextComponent) {
+                    val thirdPresenter: ThirdPresenter = sharedPresenter()
+                    val state = thirdPresenter.state.collectAsState()
 
-                FifthScreen(
-                    state = state.value,
-                    inc = { thirdPresenter.inc(state.value.count) }
-                )
+                    FifthScreen(
+                        state = state.value,
+                        inc = { thirdPresenter.inc(state.value.count) }
+                    )
+                }
             }
         }
 
         tab(SixthTab()) {
             screen(name = Screens.SixthScreen.route) {
-                val thirdPresenter: ThirdPresenter = sharedPresenter()
-                val state = thirdPresenter.state.collectAsState()
+                UpdatePresenter(factory = ::createNextComponent) {
+                    val thirdPresenter: ThirdPresenter = sharedPresenter()
+                    val state = thirdPresenter.state.collectAsState()
 
-                SixthScreen(
-                    state = state.value,
-                    inc = { thirdPresenter.inc(state.value.count) }
-                )
+                    SixthScreen(
+                        state = state.value,
+                        inc = { thirdPresenter.inc(state.value.count) }
+                    )
+                }
             }
 
         }
