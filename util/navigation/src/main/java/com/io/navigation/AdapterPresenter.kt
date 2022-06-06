@@ -1,15 +1,22 @@
 package com.io.navigation
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlin.reflect.KClass
+import kotlin.reflect.full.primaryConstructor
 
 
-abstract class AdapterPresenter<Key: Any,Controller>(
+abstract class AdapterPresenter<Key: Any,Controller> constructor(
     protected val controller: Controller,
 ) {
+
     private val owner = PresenterStoreOwner<Key>()
 
-    abstract fun updateCurrentScreen(scope: CoroutineScope)
+    protected fun updateScreen(key: Key) = owner.updateScreen(key)
+    fun pop() = owner.deleteBackStackUntilKey()
 
-    fun updateScreen(key: Key) = owner.updateScreen(key)
+    abstract suspend fun updateScreen()
+
 
 }

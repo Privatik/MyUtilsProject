@@ -23,9 +23,10 @@ import kotlinx.coroutines.flow.onEach
 @Composable
 fun Navigation(){
     val navController = rememberNavController()
+    val adapter = GooglePresenter(navController)
+    
     LaunchedEffect(Unit){
-        val adapter = GooglePresenter(navController)
-        adapter.updateCurrentScreen(this)
+        adapter.updateScreen()
     }
 
     NavHost(
@@ -39,52 +40,58 @@ fun Navigation(){
         }
 
         composable(Screens.SecondScreen.route){
-            val secondPresenter: SecondPresenter = presenter()
-            val state = secondPresenter.state.collectAsState()
-            val snackbarHostState = remember {
-                SnackbarHostState()
-            }
+            UpdatePresenter(::createAppComponent) {
+                val secondPresenter: SecondPresenter = presenter()
+                val state = secondPresenter.state.collectAsState()
+                val snackbarHostState = remember {
+                    SnackbarHostState()
+                }
 
-            LaunchedEffect(Unit){
-                secondPresenter
-                    .singleEffect
-                    .onEach {
-                        when (it){
-                            is SecondEffect.Snack -> {
-                                snackbarHostState.showSnackbar(
-                                    message = it.message,
-                                    duration = SnackbarDuration.Long
-                                )
+                LaunchedEffect(Unit){
+                    secondPresenter
+                        .singleEffect
+                        .onEach {
+                            when (it){
+                                is SecondEffect.Snack -> {
+                                    snackbarHostState.showSnackbar(
+                                        message = it.message,
+                                        duration = SnackbarDuration.Long
+                                    )
+                                }
                             }
                         }
+                        .launchIn(this)
+                }
+
+                SecondScreen(
+                    state = state.value,
+                    inc = { secondPresenter.inc(state.value.count) },
+                    incGod = { secondPresenter.incGod(state.value.godCount) },
+                    open = {
+                        navController.navigate(Screens.ThirdScreen.route)
                     }
-                    .launchIn(this)
+                )
             }
 
-            SecondScreen(
-                state = state.value,
-                inc = { secondPresenter.inc(state.value.count) },
-                incGod = { secondPresenter.incGod(state.value.godCount) },
-                open = {
-                    navController.navigate(Screens.ThirdScreen.route)
-                }
-            )
         }
 
         composable(Screens.ThirdScreen.route){
-            val thirdPresenter: ThirdPresenter = presenter()
-            val state = thirdPresenter.state.collectAsState()
+            UpdatePresenter(::createNextComponent) {
+                val thirdPresenter: ThirdPresenter = presenter()
+                val state = thirdPresenter.state.collectAsState()
 
-            TripleScreen(
-                state = state.value,
-                inc = { thirdPresenter.inc(state.value.count) },
-                backToFirst = {
-                    navController.popBackStack(Screens.FirstScreen.route, false)
-                },
-                next = {
+                TripleScreen(
+                    state = state.value,
+                    inc = { thirdPresenter.inc(state.value.count) },
+                    backToFirst = {
+                        navController.popBackStack(Screens.FirstScreen.route, false)
+                        adapter.pop()
+                    },
+                    next = {
 
-                }
-            )
+                    }
+                )
+            }
         }
 
     }

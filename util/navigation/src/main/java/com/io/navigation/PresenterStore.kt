@@ -1,10 +1,10 @@
 package com.io.navigation
 
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
-class PresenterStore internal constructor() {
-
-    private val screenWithPresenterMap = hashMapOf<Class<out UIPresenter>, UIPresenter>()
+internal class PresenterStore  {
+    private val screenWithPresenterMap = ConcurrentHashMap<Class<out UIPresenter>, UIPresenter>()
 
     fun <P: UIPresenter> createOrGetPresenter(
         clazz: Class<out UIPresenter>,
