@@ -16,6 +16,7 @@ import com.io.myutilsproject.screens.first.FirstScreen
 import com.io.myutilsproject.screens.second.SecondEffect
 import com.io.myutilsproject.screens.second.SecondPresenter
 import com.io.myutilsproject.screens.second.SecondScreen
+import com.io.myutilsproject.screens.seventh.SeventhScreen
 import com.io.myutilsproject.screens.sixth.SixthScreen
 import com.io.myutilsproject.screens.third.ThirdPresenter
 import com.io.myutilsproject.screens.third.TripleScreen
@@ -90,12 +91,14 @@ fun RootComposeBuilder.generateGraph() {
             val controller = LocalRootController.current
             val thirdPresenter: ThirdPresenter = presenter()
             val state = thirdPresenter.state.collectAsState()
+            val adapter = adapter<OdesseyPresenter>()
 
             TripleScreen(
                 state = state.value,
                 inc = { thirdPresenter.inc(state.value.count) },
                 backToFirst = {
                     controller.backToScreen(Screens.FirstScreen.route)
+                    adapter.pop()
                 },
                 next = {
                     controller.present(
@@ -126,12 +129,30 @@ fun RootComposeBuilder.generateGraph() {
         tab(SixthTab()) {
             screen(name = Screens.SixthScreen.route) {
                 UpdatePresenter(factory = ::createNextComponent) {
+                    val controller = LocalRootController.current
                     val thirdPresenter: ThirdPresenter = sharedPresenter()
                     val state = thirdPresenter.state.collectAsState()
 
                     SixthScreen(
                         state = state.value,
-                        inc = { thirdPresenter.inc(state.value.count) }
+                        inc = { thirdPresenter.inc(state.value.count) },
+                        open = {
+                            controller.push(
+                                screen = Screens.SeventhScreen.route
+                            )
+                        }
+                    )
+                }
+            }
+
+            screen(name = Screens.SeventhScreen.route) {
+                UpdatePresenter(factory = ::createNextComponent) {
+                    val thirdPresenter: ThirdPresenter = presenter()
+                    val state = thirdPresenter.state.collectAsState()
+
+                    SeventhScreen(
+                        state = state.value,
+                        inc = { thirdPresenter.inc(state.value.count) },
                     )
                 }
             }
