@@ -1,22 +1,26 @@
 package com.io.navigation
 
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
-import kotlin.reflect.KClass
-import kotlin.reflect.full.primaryConstructor
 
 
 abstract class AdapterPresenter<Key: Any,Controller> constructor(
     protected val controller: Controller,
 ) {
+    protected abstract val screenFlow: Flow<Key>
+    internal val owner = PresenterStoreOwner<Key>()
 
-    private val owner = PresenterStoreOwner<Key>()
+    private fun updateScreen(key: Key) = owner.updateScreen(key)
+    fun pop() = owner.pop()
 
-    protected fun updateScreen(key: Key) = owner.updateScreen(key)
-    fun pop() = owner.deleteBackStackUntilKey()
-
-    abstract suspend fun updateScreen()
+    fun updateScreen(): Flow<Key>{
+        return screenFlow
+            .onEach {
+                updateScreen(it)
+            }
+    }
 
 
 }

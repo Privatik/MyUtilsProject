@@ -5,7 +5,9 @@ import androidx.navigation.NavHostController
 import com.io.navigation.AdapterPresenter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import ru.alexgladkov.odyssey.compose.RootController
@@ -24,14 +26,7 @@ class OdesseyPresenter(
 //        return backStack.get(controller) as List<Screen>
 //    }
 //
-    override suspend fun updateScreen(): Unit = withContext(Dispatchers.Main.immediate){
-        controller.currentScreen
-            .onEach {
-                updateScreen(it.screen.key)
-            }
-            .launchIn(this)
-    }
-
+    override val screenFlow: Flow<String> = controller.currentScreen.map { it.screen.key }
 
 }
 
@@ -39,11 +34,5 @@ class GooglePresenter(
     controller: NavHostController,
 ): AdapterPresenter<String, NavHostController>(controller) {
 
-    override suspend fun updateScreen(): Unit = withContext(Dispatchers.Main.immediate) {
-        controller.currentBackStackEntryFlow
-            .onEach {
-                updateScreen(it.id)
-            }
-            .launchIn(this)
-    }
+    override val screenFlow: Flow<String> = controller.currentBackStackEntryFlow.map { it.id }
 }

@@ -15,3 +15,7 @@ internal fun <T: Any, K: Any> ConcurrentHashMap<T, K>.initializeOrGet(key: T, in
         initializeValue
     }
 }
+
+internal fun writeMessage(message: String){
+    println("Presenter $message")
+}

@@ -1,34 +1,35 @@
 package com.io.myutilsproject
 
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.OnBackPressedDispatcher
+import androidx.activity.compose.BackHandler
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.io.myutilsproject.screens.first.FirstScreen
 import com.io.myutilsproject.screens.second.SecondEffect
 import com.io.myutilsproject.screens.second.SecondPresenter
 import com.io.myutilsproject.screens.second.SecondScreen
 import com.io.myutilsproject.screens.third.ThirdPresenter
 import com.io.myutilsproject.screens.third.TripleScreen
+import com.io.navigation.AdapterPresenter
 import com.io.navigation.UpdatePresenter
+import com.io.navigation.adapter
 import com.io.navigation.presenter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-@Composable
-fun Navigation(){
-    val navController = rememberNavController()
-    val adapter = GooglePresenter(navController)
-    
-    LaunchedEffect(Unit){
-        adapter.updateScreen()
-    }
 
+@Composable
+fun Navigation(
+    navController: NavHostController,
+){
     NavHost(
         navController = navController,
         startDestination = Screens.FirstScreen.route){
@@ -72,13 +73,13 @@ fun Navigation(){
                     }
                 )
             }
-
         }
 
         composable(Screens.ThirdScreen.route){
             UpdatePresenter(::createNextComponent) {
                 val thirdPresenter: ThirdPresenter = presenter()
                 val state = thirdPresenter.state.collectAsState()
+                val adapter = adapter<GooglePresenter>()
 
                 TripleScreen(
                     state = state.value,
