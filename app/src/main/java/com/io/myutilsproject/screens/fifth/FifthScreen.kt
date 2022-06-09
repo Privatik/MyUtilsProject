@@ -10,12 +10,16 @@ import com.io.myutilsproject.screens.third.ThirdState
 fun FifthScreen(
     state: ThirdState,
     inc: () -> Unit,
+    open: () -> Unit
 ){
     Column() {
         Text("FifthScreen")
         Text("state ${state.count}")
         Button(onClick = { inc() }) {
 
+        }
+        Button(onClick = { open() }) {
+            Text("Open")
         }
     }
 }

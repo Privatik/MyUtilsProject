@@ -26,16 +26,13 @@ internal class PresenterStoreOwner<Key: Any>{
         } else {
             backStack.push(key)
         }
-        writeMessage("update $currentKey")
     }
 
     fun pop(){
-        writeMessage("pop")
         isPop = true
     }
 
     private fun deleteBackStackUntilKey(key: Key){
-        writeMessage("deleteBackStackUntilKey $key")
         var screen = backStack.peek()
         while (screen != key){
             backTo(screen)
@@ -45,7 +42,6 @@ internal class PresenterStoreOwner<Key: Any>{
 
     private fun backTo(screen: Key){
         backStack.pop()
-        writeMessage("delete $screen presenter")
         stores[screen]?.clear()
 
         sharedScreenWithSharedPresenter[screen]?.forEach {
@@ -74,6 +70,7 @@ internal class PresenterStoreOwner<Key: Any>{
             )
             if (!screenWithSharedPresenter.contains(clazz)){
                 sharedPresenters[clazz] = sharedPresenter.copy(count = sharedPresenter.count + 1)
+                sharedScreenWithSharedPresenter[currentKey]?.apply { add(clazz) }
                 writeMessage("Add SharedPresenter in New screen $clazz count ${sharedPresenter.count + 1}")
             }
             writeMessage("Get SharedPresenter $clazz")
