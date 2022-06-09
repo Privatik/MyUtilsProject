@@ -23,7 +23,6 @@ fun <Key: Any> PresenterCompositionLocalProvider(
     }
 
     CompositionLocalProvider(
-        LocalPresenterOwnerController provides adapter.owner,
         LocalAdapterController provides adapter,
         *providers
     ) {

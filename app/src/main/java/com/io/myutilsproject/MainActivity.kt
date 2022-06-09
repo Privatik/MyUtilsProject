@@ -1,6 +1,5 @@
 package com.io.myutilsproject
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -8,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
 import androidx.navigation.compose.rememberNavController
 import com.io.navigation.PresenterCompositionLocalProvider
+import com.io.navigation.builder
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
@@ -33,11 +33,15 @@ class MainActivity : ComponentActivity() {
             }
             .build()
 
-        val adapter = OdesseyPresenter(rootController)
+        val adapter = OdesseyPresenterAdapter(rootController)
         rootController.setupWithActivity(
             this,
             adapter
         )
+
+        val config = builder {
+            set(Constant.APP_FACTORY to ::createAppComponent)
+        }
 
         setContent {
             PresenterCompositionLocalProvider(
@@ -72,7 +76,7 @@ class MainActivity : ComponentActivity() {
     fun setGoogle(){
         setContent {
             val navController = rememberNavController()
-            val adapter = GooglePresenter(navController)
+            val adapter = GooglePresenterAdapter(navController)
 
             BackHandler(
                 onBack = {

@@ -1,15 +1,10 @@
 package com.io.myutilsproject
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.io.myutilsproject.screens.fifth.FifthScreen
 import com.io.myutilsproject.screens.first.FirstPresenter
 import com.io.myutilsproject.screens.first.FirstScreen
@@ -23,7 +18,6 @@ import com.io.myutilsproject.screens.third.TripleScreen
 import com.io.navigation.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import ru.alexgladkov.odyssey.compose.RootController
 import ru.alexgladkov.odyssey.compose.extensions.*
 import ru.alexgladkov.odyssey.compose.local.LocalRootController
 import ru.alexgladkov.odyssey.compose.navigation.RootComposeBuilder
@@ -36,7 +30,7 @@ fun RootComposeBuilder.generateGraph() {
     ) {
         UpdatePresenter(factory = ::createAppComponent) {
             val controller = LocalRootController.current
-            val firstPresenter: FirstPresenter = presenter()
+            val firstPresenter: FirstPresenter = presenter(key = Constant.APP_FACTORY)
             FirstScreen{
                 controller.push(Screens.SecondScreen.route)
             }
@@ -49,7 +43,7 @@ fun RootComposeBuilder.generateGraph() {
     ){
         UpdatePresenter(factory = ::createAppComponent) {
             val controller = LocalRootController.current
-            val secondPresenter: SecondPresenter = presenter()
+            val secondPresenter: SecondPresenter = presenter(key = Constant.APP_FACTORY)
             val state = secondPresenter.state.collectAsState()
             val snackbarHostState = remember {
                 SnackbarHostState()
@@ -89,9 +83,9 @@ fun RootComposeBuilder.generateGraph() {
     ){
         UpdatePresenter(factory = ::createNextComponent) {
             val controller = LocalRootController.current
-            val thirdPresenter: ThirdPresenter = presenter()
+            val thirdPresenter: ThirdPresenter = presenter(key = Constant.NEXT_FACTORY)
             val state = thirdPresenter.state.collectAsState()
-            val adapter = adapter<OdesseyPresenter>()
+            val adapter = adapter<OdesseyPresenterAdapter>()
 
             TripleScreen(
                 state = state.value,
@@ -115,7 +109,7 @@ fun RootComposeBuilder.generateGraph() {
         screen(name = Screens.FifthScreen.route) {
             UpdatePresenter(factory = ::createNextComponent) {
                 val controller = LocalRootController.current
-                val thirdPresenter: ThirdPresenter = sharedPresenter()
+                val thirdPresenter: ThirdPresenter = sharedPresenter(key = Constant.NEXT_FACTORY)
                 val state = thirdPresenter.state.collectAsState()
 
                 FifthScreen(
@@ -133,7 +127,7 @@ fun RootComposeBuilder.generateGraph() {
         screen(name = Screens.SixthScreen.route) {
             UpdatePresenter(factory = ::createNextComponent) {
                 val controller = LocalRootController.current
-                val thirdPresenter: ThirdPresenter = sharedPresenter()
+                val thirdPresenter: ThirdPresenter = sharedPresenter(key = Constant.NEXT_FACTORY)
                 val state = thirdPresenter.state.collectAsState()
 
                 SixthScreen(
@@ -150,7 +144,7 @@ fun RootComposeBuilder.generateGraph() {
 
         screen(name = Screens.SeventhScreen.route) {
             UpdatePresenter(factory = ::createNextComponent) {
-                val thirdPresenter: ThirdPresenter = presenter()
+                val thirdPresenter: ThirdPresenter = presenter(key = Constant.NEXT_FACTORY)
                 val state = thirdPresenter.state.collectAsState()
 
                 SeventhScreen(

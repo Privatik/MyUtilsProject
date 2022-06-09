@@ -1,6 +1,6 @@
 package com.io.myutilsproject.screens.first
 
-import com.example.machine.MachineDSL
+import com.example.machine.ReducerDSL
 import com.io.myutilsproject.Presenter
 import com.io.myutilsproject.repository.FirstRepository
 import com.io.myutilsproject.repository.SecondRepository
@@ -11,7 +11,7 @@ class FirstPresenter @Inject constructor(
     private val secondRepository: SecondRepository,
 ): Presenter<Any, Any, Any>(Any()) {
 
-    override fun machine(): MachineDSL<Any, Any>.() -> Unit = {
+    override fun machine(): ReducerDSL<Any, Any>.() -> Unit = {
 
     }
 }

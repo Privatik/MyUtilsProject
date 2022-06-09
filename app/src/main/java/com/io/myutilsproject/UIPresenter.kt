@@ -1,7 +1,7 @@
 package com.io.myutilsproject
 
-import com.example.machine.MachineDSL
-import com.example.machine.machine
+import com.example.machine.ReducerDSL
+import com.example.machine.reducer
 import com.io.navigation.UIPresenter
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -16,12 +16,12 @@ abstract class Presenter<S: Any, I: Any, E: Any> constructor(private val initSta
     private val _singleEffect = MutableSharedFlow<E>()
     val singleEffect = _singleEffect.asSharedFlow()
 
-    protected abstract fun machine(): MachineDSL<S, E>.() -> Unit
+    protected abstract fun machine(): ReducerDSL<S, E>.() -> Unit
 
     protected open suspend fun initAction(state: S) = Unit
 
     final override fun build() {
-        val machine = machine<S, E>(initState, ::initAction, machine())
+        val machine = reducer<S, E>(initState, ::initAction, machine())
         machine.state
             .onEach {
                 _state.emit(it)

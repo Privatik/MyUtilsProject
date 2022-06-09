@@ -1,11 +1,9 @@
 package com.io.myutilsproject.screens.third
 
 import androidx.compose.runtime.Stable
-import com.example.machine.MachineDSL
+import com.example.machine.ReducerDSL
 import com.io.myutilsproject.Presenter
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,7 +22,7 @@ class ThirdPresenter @Inject constructor(): Presenter<ThirdState, Any, Any>(Thir
         }
     }
 
-    override fun machine(): MachineDSL<ThirdState, Any>.() -> Unit = {
+    override fun machine(): ReducerDSL<ThirdState, Any>.() -> Unit = {
         onEach(
             everyFlow = inc,
             updateState = { oldState, payload -> oldState.copy(count = payload) }

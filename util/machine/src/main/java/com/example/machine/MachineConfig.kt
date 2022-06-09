@@ -2,14 +2,14 @@ package com.example.machine
 
 import kotlinx.coroutines.flow.*
 
-fun <S: Any, E: Any> machine(
+fun <S: Any, E: Any> reducer(
     initState: S,
     intiAction: suspend (state: S) -> Unit,
-    buildMachineDSL: MachineDSL<S, E>.() -> Unit
+    buildReducerDSL: ReducerDSL<S, E>.() -> Unit
 ): Machine<S, E>{
     val initStep = Step<S, E>(initState, null)
 
-    val dsl = MachineDSL<S, E>().apply(buildMachineDSL)
+    val dsl = ReducerDSL<S, E>().apply(buildReducerDSL)
 
     return object : Machine<S, E>{
         private val _effects = MutableSharedFlow<E>()
