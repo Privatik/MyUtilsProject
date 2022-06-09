@@ -15,6 +15,10 @@ internal val LocalAdapterController = compositionLocalOf<AdapterPresenter<out An
     error("No adapter provider")
 }
 
+internal val LocalConfigController = compositionLocalOf<Config> {
+    error("No config provider")
+}
+
 @Composable
 fun <A : AdapterPresenter<out Any>> adapter(): A {
     @Suppress("UNCHECKED_CAST")

@@ -4,12 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.io.navigation.PresenterFactory
 
-private val appFactory = DaggerAppComponent.builder().build().factory
 fun createAppComponent(): PresenterFactory{
-    return appFactory
+    return DaggerAppComponent.builder().build().factory
 }
 
-private val nextFactory = DaggerNextComponent.builder().build().factory
 fun createNextComponent(): PresenterFactory{
-    return nextFactory
+    return DaggerNextComponent.builder().build().factory
 }

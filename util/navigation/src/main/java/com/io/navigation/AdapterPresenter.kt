@@ -6,16 +6,12 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 
 
-abstract class AdapterPresenter<Key: Any> constructor(
-
-) {
+abstract class AdapterPresenter<Key: Any>(){
     protected abstract val screenFlow: Flow<Key>
     internal val owner = PresenterStoreOwner<Key>()
 
     private fun updateScreen(key: Key) = owner.updateScreen(key)
-    fun pop() {
-        owner.pop()
-    }
+    fun pop() { owner.pop() }
 
 
     protected open suspend fun afterUpdateScreen(key: Key) {}

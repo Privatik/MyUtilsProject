@@ -7,7 +7,7 @@ import ru.alexgladkov.odyssey.compose.RootController
 import ru.alexgladkov.odyssey.compose.helpers.FlowBundle
 import ru.alexgladkov.odyssey.compose.helpers.MultiStackBundle
 
-class OdesseyPresenter(
+class OdesseyPresenterAdapter(
     private var controller: RootController
 ): AdapterPresenter<String>() {
 
@@ -69,7 +69,7 @@ class OdesseyPresenter(
     }
 }
 
-class GooglePresenter(
+class GooglePresenterAdapter(
     controller: NavHostController,
 ): AdapterPresenter<String>() {
 

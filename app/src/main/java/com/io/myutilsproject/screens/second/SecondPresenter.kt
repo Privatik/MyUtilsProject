@@ -1,11 +1,10 @@
 package com.io.myutilsproject.screens.second
 
 import androidx.compose.runtime.Stable
-import com.example.machine.MachineDSL
+import com.example.machine.ReducerDSL
 import com.io.myutilsproject.Presenter
 import com.io.myutilsproject.repository.FirstRepository
 import com.io.myutilsproject.repository.SecondRepository
-import com.io.myutilsproject.repository.ThirdRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -40,7 +39,7 @@ class SecondPresenter @Inject constructor(
         }
     }
 
-    override fun machine(): MachineDSL<SecondState, SecondEffect>.() -> Unit = {
+    override fun machine(): ReducerDSL<SecondState, SecondEffect>.() -> Unit = {
         onEach(
             everyFlow = inc,
             updateState = { oldState, payload ->

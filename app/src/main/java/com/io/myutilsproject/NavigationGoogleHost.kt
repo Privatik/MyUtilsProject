@@ -1,8 +1,5 @@
 package com.io.myutilsproject
 
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.OnBackPressedDispatcher
-import androidx.activity.compose.BackHandler
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -18,7 +15,6 @@ import com.io.myutilsproject.screens.second.SecondPresenter
 import com.io.myutilsproject.screens.second.SecondScreen
 import com.io.myutilsproject.screens.third.ThirdPresenter
 import com.io.myutilsproject.screens.third.TripleScreen
-import com.io.navigation.AdapterPresenter
 import com.io.navigation.UpdatePresenter
 import com.io.navigation.adapter
 import com.io.navigation.presenter
@@ -42,7 +38,7 @@ fun Navigation(
 
         composable(Screens.SecondScreen.route){
             UpdatePresenter(::createAppComponent) {
-                val secondPresenter: SecondPresenter = presenter()
+                val secondPresenter: SecondPresenter = presenter(key = Constant.APP_FACTORY)
                 val state = secondPresenter.state.collectAsState()
                 val snackbarHostState = remember {
                     SnackbarHostState()
@@ -77,9 +73,9 @@ fun Navigation(
 
         composable(Screens.ThirdScreen.route){
             UpdatePresenter(::createNextComponent) {
-                val thirdPresenter: ThirdPresenter = presenter()
+                val thirdPresenter: ThirdPresenter = presenter(key = Constant.NEXT_FACTORY)
                 val state = thirdPresenter.state.collectAsState()
-                val adapter = adapter<GooglePresenter>()
+                val adapter = adapter<GooglePresenterAdapter>()
 
                 TripleScreen(
                     state = state.value,
