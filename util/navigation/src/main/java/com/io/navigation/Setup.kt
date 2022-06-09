@@ -7,15 +7,19 @@ import androidx.compose.runtime.ProvidedValue
 import kotlinx.coroutines.flow.launchIn
 
 @Composable
-fun <Key: Any, Controller> PresenterCompositionLocalProvider(
+fun <Key: Any> PresenterCompositionLocalProvider(
     vararg providers: ProvidedValue<*>,
-    adapter: AdapterPresenter<Key,Controller>,
+    adapter: AdapterPresenter<Key>,
+    canUpdate: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    LaunchedEffect(Unit){
-        adapter
-            .updateScreen()
-            .launchIn(this)
+
+    if (canUpdate) {
+        LaunchedEffect(Unit){
+            adapter
+                .updateScreen()
+                .launchIn(this)
+        }
     }
 
     CompositionLocalProvider(
