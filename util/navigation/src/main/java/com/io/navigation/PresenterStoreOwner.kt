@@ -2,11 +2,14 @@ package com.io.navigation
 
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.HashSet
 import kotlin.properties.Delegates
 
 internal class PresenterStoreOwner<Key: Any>{
     private val sharedPresenters = ConcurrentHashMap<Class<out UIPresenter>, SharedPresenterBody>()
     private val sharedScreenWithSharedPresenter = ConcurrentHashMap<Key, HashSet<Class<out UIPresenter>>>()
+
+    private val factoryMap = ConcurrentHashMap<Class<out PresenterFactory>, Int>()
 
     private val stores = ConcurrentHashMap<Key, PresenterStore>()
     private val backStack = Stack<Key>()
@@ -78,13 +81,29 @@ internal class PresenterStoreOwner<Key: Any>{
             return sharedPresenter.presenter as P
         } else {
             val presenter = factory.create<P>(clazz)
-            sharedPresenters[clazz] = SharedPresenterBody(presenter = presenter)
+            val clazzFactory = factory::class.java
+
+            sharedPresenters[clazz] = SharedPresenterBody(presenter = presenter, clazzFactory = clazzFactory)
             val clazzSet = hashSetOf(clazz)
             writeMessage("Add SharedPresenter $clazz")
+
+            val countFactories = factoryMap.initializeOrGet(
+                clazzFactory,
+                0
+            )
+
+            factoryMap[clazzFactory] = countFactories + 1
+
             sharedScreenWithSharedPresenter[currentKey] = clazzSet
             presenter.build()
             return presenter
         }
+    }
+
+    private fun factoryCount(
+
+    ) {
+        // TO DO
     }
 
     fun createOrGetPresenterStore(): PresenterStore {

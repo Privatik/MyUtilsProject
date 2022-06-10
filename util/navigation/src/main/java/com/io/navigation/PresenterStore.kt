@@ -4,7 +4,7 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 internal class PresenterStore  {
-    private val screenWithPresenterMap = ConcurrentHashMap<Class<out UIPresenter>, UIPresenter>()
+    private val screenWithPresenterMap = ConcurrentHashMap<Class<out UIPresenter>, PresenterBody>()
 
     fun <P: UIPresenter> createOrGetPresenter(
         clazz: Class<out UIPresenter>,
@@ -17,7 +17,7 @@ internal class PresenterStore  {
         } else {
             val presenter = factory.create<P>(clazz)
             writeMessage("Add Presenter $clazz")
-            screenWithPresenterMap[clazz] = presenter
+            screenWithPresenterMap[clazz] = PresenterBody(presenter, factory::class.java)
             presenter.build()
             return presenter
         }
@@ -25,7 +25,7 @@ internal class PresenterStore  {
 
     fun clear(){
         screenWithPresenterMap.forEach { ( clazz, _ ) ->
-            screenWithPresenterMap.remove(clazz)!!.clear()
+            screenWithPresenterMap.remove(clazz)!!.presenter.clear()
             writeMessage("delete $clazz presenter")
         }
     }
