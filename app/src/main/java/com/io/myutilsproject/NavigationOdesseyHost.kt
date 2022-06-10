@@ -28,86 +28,82 @@ fun RootComposeBuilder.generateGraph() {
     screen(
         name = Screens.FirstScreen.route,
     ) {
-        UpdatePresenter(factory = ::createAppComponent) {
-            val controller = LocalRootController.current
-            val firstPresenter: FirstPresenter = presenter(key = Constant.APP_FACTORY)
-            FirstScreen{
-                controller.push(Screens.SecondScreen.route)
-            }
+        val controller = LocalRootController.current
+        val firstPresenter: FirstPresenter = presenter(key = Constant.APP_FACTORY)
+        FirstScreen{
+            controller.push(Screens.SecondScreen.route)
         }
-
     }
 
     screen(
         name = Screens.SecondScreen.route,
     ){
-        UpdatePresenter(factory = ::createAppComponent) {
-            val controller = LocalRootController.current
-            val secondPresenter: SecondPresenter = presenter(key = Constant.APP_FACTORY)
-            val state = secondPresenter.state.collectAsState()
-            val snackbarHostState = remember {
-                SnackbarHostState()
-            }
+        RebuildConfig{ release(Constant.NEXT_FACTORY) }
+        val controller = LocalRootController.current
+        val secondPresenter: SecondPresenter = presenter(key = Constant.APP_FACTORY)
+        val state = secondPresenter.state.collectAsState()
+        val snackbarHostState = remember {
+            SnackbarHostState()
+        }
 
-            LaunchedEffect(Unit) {
-                secondPresenter
-                    .singleEffect
-                    .onEach {
-                        when (it) {
-                            is SecondEffect.Snack -> {
-                                snackbarHostState.showSnackbar(
-                                    message = it.message,
-                                    duration = SnackbarDuration.Long
-                                )
-                            }
+        LaunchedEffect(Unit) {
+            secondPresenter
+                .singleEffect
+                .onEach {
+                    when (it) {
+                        is SecondEffect.Snack -> {
+                            snackbarHostState.showSnackbar(
+                                message = it.message,
+                                duration = SnackbarDuration.Long
+                            )
                         }
                     }
-                    .launchIn(this)
-            }
-
-            SecondScreen(
-                state = state.value,
-                inc = { secondPresenter.inc(state.value.count) },
-                incGod = { secondPresenter.incGod(state.value.godCount) },
-                open = {
-                    controller.push(
-                        screen = Screens.ThirdScreen.route
-                    )
                 }
-            )
+                .launchIn(this)
         }
+
+        SecondScreen(
+            state = state.value,
+            inc = { secondPresenter.inc(state.value.count) },
+            incGod = { secondPresenter.incGod(state.value.godCount) },
+            open = {
+                controller.push(
+                    screen = Screens.ThirdScreen.route
+                )
+            }
+        )
     }
 
     screen(
         name = Screens.ThirdScreen.route,
     ){
-        UpdatePresenter(factory = ::createNextComponent) {
-            val controller = LocalRootController.current
-            val thirdPresenter: ThirdPresenter = presenter(key = Constant.NEXT_FACTORY)
-            val state = thirdPresenter.state.collectAsState()
-            val adapter = adapter<OdesseyPresenterAdapter>()
-
-            TripleScreen(
-                state = state.value,
-                inc = { thirdPresenter.inc(state.value.count) },
-                backToFirst = {
-                    controller.backToScreen(Screens.FirstScreen.route)
-                    adapter.pop()
-                },
-                next = {
-                    controller.present(
-                        screen = Screens.FourScreen.route,
-                        startScreen = Screens.FifthScreen.route
-                    )
-                }
-            )
+        RebuildConfig{
+            put(Constant.NEXT_FACTORY to ::createNextComponent)
         }
+        val controller = LocalRootController.current
+        val thirdPresenter: ThirdPresenter = presenter(key = Constant.NEXT_FACTORY)
+        val state = thirdPresenter.state.collectAsState()
+        val adapter = adapter<OdesseyPresenterAdapter>()
 
+        TripleScreen(
+            state = state.value,
+            inc = { thirdPresenter.inc(state.value.count) },
+            backToFirst = {
+                controller.backToScreen(Screens.FirstScreen.route)
+                adapter.pop()
+            },
+            next = {
+                controller.present(
+                    screen = Screens.FourScreen.route,
+                    startScreen = Screens.FifthScreen.route
+                )
+            }
+        )
     }
 
     flow(name = Screens.FourScreen.route) {
         screen(name = Screens.FifthScreen.route) {
-            UpdatePresenter(factory = ::createNextComponent) {
+
                 val controller = LocalRootController.current
                 val thirdPresenter: ThirdPresenter = sharedPresenter(key = Constant.NEXT_FACTORY)
                 val state = thirdPresenter.state.collectAsState()
@@ -121,11 +117,11 @@ fun RootComposeBuilder.generateGraph() {
                         )
                     }
                 )
-            }
+
         }
 
         screen(name = Screens.SixthScreen.route) {
-            UpdatePresenter(factory = ::createNextComponent) {
+
                 val controller = LocalRootController.current
                 val thirdPresenter: ThirdPresenter = sharedPresenter(key = Constant.NEXT_FACTORY)
                 val state = thirdPresenter.state.collectAsState()
@@ -139,11 +135,11 @@ fun RootComposeBuilder.generateGraph() {
                         )
                     }
                 )
-            }
+
         }
 
         screen(name = Screens.SeventhScreen.route) {
-            UpdatePresenter(factory = ::createNextComponent) {
+
                 val thirdPresenter: ThirdPresenter = presenter(key = Constant.NEXT_FACTORY)
                 val state = thirdPresenter.state.collectAsState()
 
@@ -152,7 +148,6 @@ fun RootComposeBuilder.generateGraph() {
                     inc = { thirdPresenter.inc(state.value.count) },
                 )
             }
-        }
     }
 
 //    bottomNavigation(name = Screens.FourScreen.route, tabsNavModel = BottomConfiguration()) {

@@ -15,12 +15,10 @@ import com.io.myutilsproject.screens.second.SecondPresenter
 import com.io.myutilsproject.screens.second.SecondScreen
 import com.io.myutilsproject.screens.third.ThirdPresenter
 import com.io.myutilsproject.screens.third.TripleScreen
-import com.io.navigation.UpdatePresenter
 import com.io.navigation.adapter
 import com.io.navigation.presenter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-
 
 @Composable
 fun Navigation(
@@ -37,7 +35,7 @@ fun Navigation(
         }
 
         composable(Screens.SecondScreen.route){
-            UpdatePresenter(::createAppComponent) {
+
                 val secondPresenter: SecondPresenter = presenter(key = Constant.APP_FACTORY)
                 val state = secondPresenter.state.collectAsState()
                 val snackbarHostState = remember {
@@ -68,11 +66,11 @@ fun Navigation(
                         navController.navigate(Screens.ThirdScreen.route)
                     }
                 )
-            }
+
         }
 
         composable(Screens.ThirdScreen.route){
-            UpdatePresenter(::createNextComponent) {
+
                 val thirdPresenter: ThirdPresenter = presenter(key = Constant.NEXT_FACTORY)
                 val state = thirdPresenter.state.collectAsState()
                 val adapter = adapter<GooglePresenterAdapter>()
@@ -88,7 +86,7 @@ fun Navigation(
 
                     }
                 )
-            }
+
         }
 
     }

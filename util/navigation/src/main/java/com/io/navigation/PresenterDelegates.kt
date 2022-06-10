@@ -19,13 +19,14 @@ public fun <P : UIPresenter> presenter(
     clazz: Class<out UIPresenter>,
     isShared: Boolean = false
 ): P {
-    checkNotNull(LocalPresenterOwnerController.current)
-    checkNotNull(LocalPresenterFactoryController.current)
+    checkNotNull(LocalAdapterController.current)
 
-    val factory = LocalPresenterFactoryController.current
-    val owner = LocalPresenterOwnerController.current
+    val adapter = LocalAdapterController.current
 
     return remember {
+        val factory = adapter.config.get(key)
+        val owner = adapter.owner
+
         if (isShared){
             owner.createOrGetSharedPresenter<P>(clazz, factory)
         } else {

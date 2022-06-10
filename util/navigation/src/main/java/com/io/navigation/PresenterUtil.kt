@@ -9,25 +9,9 @@ fun emptyPresenter(): PresenterFactory{
 }
 
 @Composable
-fun UpdatePresenter(
-    factory: () -> PresenterFactory,
-    content: @Composable () -> Unit
+fun RebuildConfig(
+    rule: Config.() -> Unit
 ){
-    CompositionLocalProvider(
-        LocalPresenterFactoryController provides factory.invoke()
-    ) {
-        content()
-    }
-}
-
-@Composable
-fun UpdatePresenter(
-    factory: PresenterFactory,
-    content: @Composable () -> Unit
-){
-    CompositionLocalProvider(
-        LocalPresenterFactoryController provides factory
-    ) {
-        content()
-    }
+    val adapter = LocalAdapterController.current
+    adapter.config.apply(rule)
 }

@@ -6,7 +6,9 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 
 
-abstract class AdapterPresenter<Key: Any>(){
+abstract class AdapterPresenter<Key: Any>(
+    internal val config: Config
+){
     protected abstract val screenFlow: Flow<Key>
     internal val owner = PresenterStoreOwner<Key>()
 

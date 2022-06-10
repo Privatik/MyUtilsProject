@@ -1,22 +1,28 @@
 package com.io.navigation
 
-class Config internal constructor(items: HashMap<String?, ConfigItem>){
-    internal val items = HashMap<String?, ConfigItem>()
+import java.util.concurrent.ConcurrentHashMap
 
-    init {
-        this.items.putAll(items)
+class Config internal constructor(){
+    private val items = ConcurrentHashMap<String?, ConfigItem>()
+
+    fun put(item: Pair<String, () -> PresenterFactory>){
+        if (item.first.isBlank()) return
+        if (!items.contains(item.first)){
+            items[item.first] = ConfigItem(item.second)
+        }
     }
 
-    fun set(item: Pair<String, () -> PresenterFactory>){
-        items[item.first] = ConfigItem(item.second)
+    fun release(itemKey: String){
+        if (itemKey.isBlank()) return
+        items.remove(itemKey)
     }
 
-    internal fun get(key: String): PresenterFactory{
-        return items[key]!!.factory
+    internal fun get(key: String?): PresenterFactory{
+        return items[key]?.factory ?: EmptyPresenterFactory()
     }
 }
 
-internal class ConfigItem(
+private class ConfigItem(
     factory: () -> PresenterFactory
 ){
     val factory: PresenterFactory by lazy(factory)

@@ -33,15 +33,15 @@ class MainActivity : ComponentActivity() {
             }
             .build()
 
-        val adapter = OdesseyPresenterAdapter(rootController)
+        val config = builder {
+            put(Constant.APP_FACTORY to ::createAppComponent)
+        }
+
+        val adapter = OdesseyPresenterAdapter(rootController, config)
         rootController.setupWithActivity(
             this,
             adapter
         )
-
-        val config = builder {
-            set(Constant.APP_FACTORY to ::createAppComponent)
-        }
 
         setContent {
             PresenterCompositionLocalProvider(
@@ -74,9 +74,13 @@ class MainActivity : ComponentActivity() {
     }
 
     fun setGoogle(){
+        val config = builder {
+            put(Constant.APP_FACTORY to ::createAppComponent)
+        }
+
         setContent {
             val navController = rememberNavController()
-            val adapter = GooglePresenterAdapter(navController)
+            val adapter = GooglePresenterAdapter(navController,config)
 
             BackHandler(
                 onBack = {
