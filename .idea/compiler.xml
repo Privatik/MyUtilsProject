@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel target="1.8">
+    <bytecodeTargetLevel target="1.7">
       <module name="MyUtilsProject.another" target="11" />
       <module name="MyUtilsProject.app" target="11" />
-      <module name="MyUtilsProject.util.navigation" target="11" />
+      <module name="MyUtilsProject.util.machine" target="1.8" />
+      <module name="MyUtilsProject.util.machine.main" target="1.8" />
+      <module name="MyUtilsProject.util.machine.test" target="1.8" />
+      <module name="MyUtilsProject.util.navigation-android" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>

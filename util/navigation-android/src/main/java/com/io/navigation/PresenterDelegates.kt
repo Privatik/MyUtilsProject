@@ -2,6 +2,7 @@ package com.io.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import com.io.navigation_common.UIPresenter
 
 @Composable
 public inline fun <reified P: UIPresenter> presenter(key: String? = null): P {
@@ -19,13 +20,13 @@ public fun <P : UIPresenter> presenter(
     clazz: Class<out UIPresenter>,
     isShared: Boolean = false
 ): P {
-    checkNotNull(LocalAdapterController.current)
+    checkNotNull(LocalPresenterController.current)
 
-    val adapter = LocalAdapterController.current
+    val controller = LocalPresenterController.current
 
     return remember {
-        val factory = adapter.config.get(key)
-        val owner = adapter.owner
+        val factory = controller.config.get(key)
+        val owner = controller.owner
 
         if (isShared){
             owner.createOrGetSharedPresenter<P>(clazz, factory)

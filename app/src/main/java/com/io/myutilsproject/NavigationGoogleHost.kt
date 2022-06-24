@@ -15,7 +15,7 @@ import com.io.myutilsproject.screens.second.SecondPresenter
 import com.io.myutilsproject.screens.second.SecondScreen
 import com.io.myutilsproject.screens.third.ThirdPresenter
 import com.io.myutilsproject.screens.third.TripleScreen
-import com.io.navigation.adapter
+import com.io.navigation.presenterController
 import com.io.navigation.presenter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -73,7 +73,7 @@ fun Navigation(
 
                 val thirdPresenter: ThirdPresenter = presenter(key = Constant.NEXT_FACTORY)
                 val state = thirdPresenter.state.collectAsState()
-                val adapter = adapter<GooglePresenterAdapter>()
+                val adapter = presenterController<GooglePresenterController>()
 
                 TripleScreen(
                     state = state.value,

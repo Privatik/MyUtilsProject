@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.launchIn
 @Composable
 fun <Key: Any> PresenterCompositionLocalProvider(
     vararg providers: ProvidedValue<*>,
-    adapter: AdapterPresenter<Key>,
+    adapter: com.io.navigation_common.PresenterController<Key>,
     canUpdate: Boolean = true,
     content: @Composable () -> Unit
 ) {
@@ -23,7 +23,7 @@ fun <Key: Any> PresenterCompositionLocalProvider(
     }
 
     CompositionLocalProvider(
-        LocalAdapterController provides adapter,
+        LocalPresenterController provides adapter,
         *providers
     ) {
         content()

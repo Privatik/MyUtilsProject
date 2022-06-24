@@ -1,4 +1,4 @@
-package com.io.navigation
+package com.io.navigation_common
 
 internal data class SharedPresenterBody(
     val count: Int = 1,

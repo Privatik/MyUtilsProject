@@ -1,16 +1,13 @@
-package com.io.navigation
+package com.io.navigation_common
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.withContext
 
 
-abstract class AdapterPresenter<Key: Any>(
-    internal val config: Config
+abstract class PresenterController<Key: Any>(
+    private val owner: PresenterStoreOwner<Key>
 ){
     protected abstract val screenFlow: Flow<Key>
-    internal val owner = PresenterStoreOwner<Key>()
 
     private fun updateScreen(key: Key) = owner.updateScreen(key)
     fun pop() { owner.pop() }
