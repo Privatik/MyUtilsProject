@@ -1,13 +1,11 @@
 package com.io.myutilsproject
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.io.navigation.PresenterFactory
+import com.io.navigation_common.PresenterFactory
 
-fun createAppComponent(): PresenterFactory{
+fun createAppComponent(): PresenterFactory {
     return DaggerAppComponent.builder().build().factory
 }
 
-fun createNextComponent(): PresenterFactory{
+fun createNextComponent(): PresenterFactory {
     return DaggerNextComponent.builder().build().factory
 }

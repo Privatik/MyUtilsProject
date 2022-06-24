@@ -7,7 +7,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
 import androidx.navigation.compose.rememberNavController
 import com.io.navigation.PresenterCompositionLocalProvider
-import com.io.navigation.builder
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
@@ -18,12 +17,19 @@ import ru.alexgladkov.odyssey.compose.navigation.modal_navigation.ModalNavigator
 import java.util.*
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setOdessey()
 //        setGoogle()
 
+    }
+
+    override fun onPause() {
+        super.onPause()
+        val ob = lastNonConfigurationInstance
+        ob
     }
 
     fun setOdessey(){
@@ -33,11 +39,11 @@ class MainActivity : ComponentActivity() {
             }
             .build()
 
-        val config = builder {
-            put(Constant.APP_FACTORY to ::createAppComponent)
+        val config = com.io.navigation_common.builder {
+            put(Constant.APP_FACTORY, ::createAppComponent)
         }
 
-        val adapter = OdesseyPresenterAdapter(rootController, config)
+        val adapter = OdesseyPresenterController(rootController, config)
         rootController.setupWithActivity(
             this,
             adapter
@@ -74,13 +80,13 @@ class MainActivity : ComponentActivity() {
     }
 
     fun setGoogle(){
-        val config = builder {
+        val config = com.io.navigation_common.builder {
             put(Constant.APP_FACTORY to ::createAppComponent)
         }
 
         setContent {
             val navController = rememberNavController()
-            val adapter = GooglePresenterAdapter(navController,config)
+            val adapter = GooglePresenterController(navController,config)
 
             BackHandler(
                 onBack = {
