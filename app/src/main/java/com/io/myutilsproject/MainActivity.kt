@@ -6,7 +6,10 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
 import androidx.navigation.compose.rememberNavController
+import com.io.navigation.PresenterComponentActivity
 import com.io.navigation.PresenterCompositionLocalProvider
+import com.io.navigation_common.Config
+import com.io.navigation_common.builder
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
@@ -16,20 +19,14 @@ import ru.alexgladkov.odyssey.compose.navigation.RootComposeBuilder
 import ru.alexgladkov.odyssey.compose.navigation.modal_navigation.ModalNavigator
 import java.util.*
 
-class MainActivity : ComponentActivity() {
+class MainActivity : PresenterComponentActivity<String>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setOdessey()
-//        setGoogle()
+//        setOdessey()
+        setGoogle()
 
-    }
-
-    override fun onPause() {
-        super.onPause()
-        val ob = lastNonConfigurationInstance
-        ob
     }
 
     fun setOdessey(){
@@ -39,31 +36,27 @@ class MainActivity : ComponentActivity() {
             }
             .build()
 
-        val config = com.io.navigation_common.builder {
-            put(Constant.APP_FACTORY, ::createAppComponent)
-        }
-
-        val adapter = OdesseyPresenterController(rootController, config)
+        val controller = OdesseyPresenterController(rootController, initializeConfig())
         rootController.setupWithActivity(
             this,
-            adapter
+            controller
         )
 
         setContent {
             PresenterCompositionLocalProvider(
                 LocalRootController provides rootController,
-                adapter = adapter,
+                controller = controller,
                 canUpdate = false
             ) {
                 var flag by remember { mutableStateOf(UUID.randomUUID()) }
                 LaunchedEffect(flag){
-                    adapter
+                    controller
                         .updateScreen()
                         .launchIn(this)
 
                     merge(
-                        adapter.updateControllerFlow  ,
-                        adapter.updateParentControllerFlow
+                        controller.updateControllerFlow  ,
+                        controller.updateParentControllerFlow
                     )
                         .onEach {
                             flag = UUID.randomUUID()
@@ -80,13 +73,10 @@ class MainActivity : ComponentActivity() {
     }
 
     fun setGoogle(){
-        val config = com.io.navigation_common.builder {
-            put(Constant.APP_FACTORY to ::createAppComponent)
-        }
 
         setContent {
             val navController = rememberNavController()
-            val adapter = GooglePresenterController(navController,config)
+            val controller = GooglePresenterController(navController, initializeConfig())
 
             BackHandler(
                 onBack = {
@@ -94,13 +84,13 @@ class MainActivity : ComponentActivity() {
                         finish()
                     } else {
                         navController.popBackStack()
-                        adapter.pop()
+                        controller.pop()
                     }
                 }
             )
 
             PresenterCompositionLocalProvider(
-                adapter = adapter
+                controller = controller
             ) {
 
                 Navigation(
@@ -108,5 +98,9 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
+    }
+
+    override fun initializeConfig(): Config = builder {
+        put(Constant.APP_FACTORY, ::createAppComponent)
     }
 }

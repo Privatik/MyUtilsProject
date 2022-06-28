@@ -15,6 +15,7 @@ import com.io.myutilsproject.screens.second.SecondPresenter
 import com.io.myutilsproject.screens.second.SecondScreen
 import com.io.myutilsproject.screens.third.ThirdPresenter
 import com.io.myutilsproject.screens.third.TripleScreen
+import com.io.navigation.RebuildConfig
 import com.io.navigation.presenterController
 import com.io.navigation.presenter
 import kotlinx.coroutines.flow.launchIn
@@ -70,22 +71,25 @@ fun Navigation(
         }
 
         composable(Screens.ThirdScreen.route){
+            RebuildConfig{
+                put(Constant.NEXT_FACTORY, ::createNextComponent)
+            }
 
-                val thirdPresenter: ThirdPresenter = presenter(key = Constant.NEXT_FACTORY)
-                val state = thirdPresenter.state.collectAsState()
-                val adapter = presenterController<GooglePresenterController>()
+            val thirdPresenter: ThirdPresenter = presenter(key = Constant.NEXT_FACTORY)
+            val state = thirdPresenter.state.collectAsState()
+            val adapter = presenterController<GooglePresenterController>()
 
-                TripleScreen(
-                    state = state.value,
-                    inc = { thirdPresenter.inc(state.value.count) },
-                    backToFirst = {
-                        navController.popBackStack(Screens.FirstScreen.route, false)
-                        adapter.pop()
-                    },
-                    next = {
+            TripleScreen(
+                state = state.value,
+                inc = { thirdPresenter.inc(state.value.count) },
+                backToFirst = {
+                    navController.popBackStack(Screens.FirstScreen.route, false)
+                    adapter.pop()
+                },
+                next = {
 
-                    }
-                )
+                }
+            )
 
         }
 

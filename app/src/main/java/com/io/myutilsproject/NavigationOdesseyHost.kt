@@ -38,7 +38,7 @@ fun RootComposeBuilder.generateGraph() {
     screen(
         name = Screens.SecondScreen.route,
     ){
-        RebuildConfig{ release(Constant.NEXT_FACTORY) }
+        RebuildConfig{ releaseFull(Constant.NEXT_FACTORY) }
         val controller = LocalRootController.current
         val secondPresenter: SecondPresenter = presenter(key = Constant.APP_FACTORY)
         val state = secondPresenter.state.collectAsState()
@@ -78,7 +78,7 @@ fun RootComposeBuilder.generateGraph() {
         name = Screens.ThirdScreen.route,
     ){
         RebuildConfig{
-            put(Constant.NEXT_FACTORY to ::createNextComponent)
+            put(Constant.NEXT_FACTORY,::createNextComponent)
         }
         val controller = LocalRootController.current
         val thirdPresenter: ThirdPresenter = presenter(key = Constant.NEXT_FACTORY)

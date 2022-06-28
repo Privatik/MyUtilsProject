@@ -6,33 +6,21 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.io.navigation_common.Config
 import com.io.navigation_common.PresenterController
+import com.io.navigation_common.PresenterStoreOwner
 
-abstract class PresenterComponentActivity<Controller, Key: Any>: ComponentActivity(){
+abstract class PresenterComponentActivity<Key: Any>: ComponentActivity(){
 
     @Suppress("UNCHECKED_CAST")
     private val vm: ViewModelForPresenter<Key> by viewModels{
         object: ViewModelProvider.Factory{
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return ViewModelForPresenter<Key>() as T
+                return ViewModelForPresenter<Key>(initializeConfig()) as T
             }
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-
-
-    }
-
-    @Composable
-    fun Controller(controller: Controller): PresenterController<Key>{
-
-    }
-
-    fun setController(controller: Controller){
-
-    }
+    abstract fun initializeConfig(): Config
 
 }

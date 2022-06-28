@@ -20,7 +20,7 @@ internal class FactoryObjectCounter(private val config: Config) {
         if (countFactories != null){
             if (countFactories.count == 1){
                 factoryMap.remove(clazz)
-                config.release(countFactories.itemKey)
+                config.stop(countFactories.itemKey)
             } else {
                 factoryMap[clazz] = countFactories.copy(count = countFactories.count - 1)
             }
