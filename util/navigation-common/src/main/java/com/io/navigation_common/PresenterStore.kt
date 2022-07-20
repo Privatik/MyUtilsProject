@@ -2,11 +2,10 @@ package com.io.navigation_common
 
 import java.util.concurrent.ConcurrentHashMap
 
-internal class PresenterStore(private val factoryObjectCounter: FactoryObjectCounter)  {
+internal class PresenterStore()  {
     private val screenWithPresenterMap = HashMap<Class<out UIPresenter>, PresenterBody>()
 
     fun <P: UIPresenter> createOrGetPresenter(
-        itemKey: String?,
         clazz: Class<out UIPresenter>,
         factory: PresenterFactory
     ): P {
@@ -19,8 +18,6 @@ internal class PresenterStore(private val factoryObjectCounter: FactoryObjectCou
             writeMessage("Add Presenter $clazz")
             screenWithPresenterMap[clazz] = PresenterBody(presenter, factory::class.java)
 
-            factoryObjectCounter.addObject(itemKey, factory::class.java)
-
             presenter.build()
             return presenter
         }
@@ -30,7 +27,6 @@ internal class PresenterStore(private val factoryObjectCounter: FactoryObjectCou
         screenWithPresenterMap.forEach { ( clazz, _ ) ->
             screenWithPresenterMap.remove(clazz)!!.apply {
                 presenter.clear()
-                factoryObjectCounter.removeObject(clazzFactory)
             }
             writeMessage("delete $clazz presenter")
         }

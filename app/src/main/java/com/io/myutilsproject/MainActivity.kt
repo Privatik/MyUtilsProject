@@ -1,15 +1,13 @@
 package com.io.myutilsproject
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
 import androidx.navigation.compose.rememberNavController
 import com.io.navigation.PresenterComponentActivity
 import com.io.navigation.PresenterCompositionLocalProvider
-import com.io.navigation_common.Config
-import com.io.navigation_common.builder
+import com.io.navigation.setContentWithPresenter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
@@ -36,38 +34,36 @@ class MainActivity : PresenterComponentActivity<String>() {
             }
             .build()
 
-        val controller = OdesseyPresenterController(rootController, initializeConfig())
+        val controller = OdesseyPresenterController(rootController,  presenterStoreOwner)
         rootController.setupWithActivity(
             this,
             controller
         )
 
-        setContent {
-            PresenterCompositionLocalProvider(
-                LocalRootController provides rootController,
-                controller = controller,
-                canUpdate = false
-            ) {
-                var flag by remember { mutableStateOf(UUID.randomUUID()) }
-                LaunchedEffect(flag){
-                    controller
-                        .updateScreen()
-                        .launchIn(this)
+        setContentWithPresenter(
+            LocalRootController provides rootController,
+            controller = controller,
+            canUpdate = false
+        ) {
+            var flag by remember { mutableStateOf(UUID.randomUUID()) }
+            LaunchedEffect(flag){
+                controller
+                    .updateScreen()
+                    .launchIn(this)
 
-                    merge(
-                        controller.updateControllerFlow  ,
-                        controller.updateParentControllerFlow
-                    )
-                        .onEach {
-                            flag = UUID.randomUUID()
-                        }
-                        .launchIn(this)
+                merge(
+                    controller.updateControllerFlow  ,
+                    controller.updateParentControllerFlow
+                )
+                    .onEach {
+                        flag = UUID.randomUUID()
+                    }
+                    .launchIn(this)
 
-                }
+            }
 
-                ModalNavigator {
-                    Navigator(Screens.FirstScreen.route)
-                }
+            ModalNavigator {
+                Navigator(Screens.FirstScreen.route)
             }
         }
     }
@@ -76,7 +72,7 @@ class MainActivity : PresenterComponentActivity<String>() {
 
         setContent {
             val navController = rememberNavController()
-            val controller = GooglePresenterController(navController, initializeConfig())
+            val controller = GooglePresenterController(navController)
 
             BackHandler(
                 onBack = {
@@ -90,7 +86,8 @@ class MainActivity : PresenterComponentActivity<String>() {
             )
 
             PresenterCompositionLocalProvider(
-                controller = controller
+                controller = controller,
+                owner = presenterStoreOwner
             ) {
 
                 Navigation(
@@ -98,9 +95,5 @@ class MainActivity : PresenterComponentActivity<String>() {
                 )
             }
         }
-    }
-
-    override fun initializeConfig(): Config = builder {
-        put(Constant.APP_FACTORY, ::createAppComponent)
     }
 }

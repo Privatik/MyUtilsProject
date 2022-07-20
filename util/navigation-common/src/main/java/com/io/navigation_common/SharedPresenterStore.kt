@@ -2,14 +2,11 @@ package com.io.navigation_common
 
 import java.util.HashMap
 
-internal class SharedPresenterStore<Key: Any>(
-    private val factoryObjectCounter: FactoryObjectCounter
-) {
+internal class SharedPresenterStore<Key: Any>() {
     private val sharedPresenters = HashMap<Class<out UIPresenter>, SharedPresenterBody>()
     private val sharedScreenWithSharedPresenter = HashMap<Key, HashSet<Class<out UIPresenter>>>()
 
     internal fun <P: UIPresenter> createOrGetSharedPresenter(
-        itemKey: String?,
         currentKey: Key,
         clazz: Class<out UIPresenter>,
         factory: PresenterFactory
@@ -36,8 +33,6 @@ internal class SharedPresenterStore<Key: Any>(
             val clazzSet = hashSetOf(clazz)
             writeMessage("Add SharedPresenter $clazz")
 
-            factoryObjectCounter.addObject(itemKey, clazzFactory)
-
             sharedScreenWithSharedPresenter[currentKey] = clazzSet
             presenter.build()
             return presenter
@@ -54,7 +49,6 @@ internal class SharedPresenterStore<Key: Any>(
             if (count <= 1){
                 sharedPresenters.remove(it)!!.apply {
                     presenter.clear()
-                    factoryObjectCounter.removeObject(clazzFactory)
                 }
             } else {
                 sharedPresenters[it] = sharedPresenter.copy(count = count - 1)
