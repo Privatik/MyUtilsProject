@@ -4,9 +4,8 @@ import java.util.*
 import kotlin.collections.HashSet
 import kotlin.properties.Delegates
 
-class PresenterStoreOwner<Key: Any>(private val config: Config){
-    private val factoryObjectCounter = FactoryObjectCounter(config)
-    private val sharedPresenterStore = SharedPresenterStore<Key>(factoryObjectCounter)
+class PresenterStoreOwner<Key: Any>(){
+    private val sharedPresenterStore = SharedPresenterStore<Key>()
     private val stores = HashMap<Key, PresenterStore>()
 
     private val backStack = Stack<Key>()
@@ -47,26 +46,23 @@ class PresenterStoreOwner<Key: Any>(private val config: Config){
     }
 
     fun <P: UIPresenter> createPresenter(
-        key: String?,
         clazz: Class<out UIPresenter>,
+        factory: PresenterFactory,
         isShared: Boolean = false
     ): P {
-        val factory = config.get(key)
         return if (isShared){
-            sharedPresenterStore.createOrGetSharedPresenter<P>(key, currentKey, clazz, factory)
+            sharedPresenterStore.createOrGetSharedPresenter<P>(currentKey, clazz, factory)
         } else {
             val store = createOrGetPresenterStore()
-            store.createOrGetPresenter<P>(key, clazz, factory)
+            store.createOrGetPresenter<P>(clazz, factory)
         }
     }
 
-    fun updateConfig(configNewRule: Config.() -> Unit) = config.apply(configNewRule)
-
-    internal fun createOrGetPresenterStore(): PresenterStore {
+    private fun createOrGetPresenterStore(): PresenterStore {
         stores[currentKey]?.let {
             return it
         }
-        val store = PresenterStore(factoryObjectCounter)
+        val store = PresenterStore()
         stores[currentKey] = store
 
         return store
