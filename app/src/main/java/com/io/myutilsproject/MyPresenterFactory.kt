@@ -10,7 +10,7 @@ class MyPresenterFactory @Inject constructor(
 ): com.io.navigation_common.PresenterFactory {
 
     @Suppress("UNCHECKED_CAST")
-    override fun <P : com.io.navigation_common.UIPresenter> create(model: Class<out com.io.navigation_common.UIPresenter>): P {
+    override fun <P : UIPresenter> create(model: Class<out UIPresenter>): P {
          return presenterFactories.getValue(model as Class<out Presenter<*,*,*>>).get() as P
     }
 

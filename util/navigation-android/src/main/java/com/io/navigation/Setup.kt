@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ProvidedValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import com.io.navigation_common.PresenterController
 import com.io.navigation_common.PresenterStoreOwner
 import kotlinx.coroutines.flow.launchIn
@@ -15,6 +16,7 @@ fun <Key: Any> PresenterCompositionLocalProvider(
     controller: PresenterController<Key>,
     owner: PresenterStoreOwner<Key>,
     canUpdate: Boolean = true,
+    canSaveStateKey: Boolean = false,
     content: @Composable () -> Unit
 ) {
 
@@ -26,19 +28,32 @@ fun <Key: Any> PresenterCompositionLocalProvider(
         }
     }
 
+
+    val ownerProvider = if (canSaveStateKey){
+        require(owner is AndroidPresenterStoreOwner) {
+            "Not correct extends, use AndroidPresenterStoreOwner as parent for owner"
+        }
+        
+        val newOwner = rememberSaveable(saver = PresenterOwnerSaver()) { owner }
+        LocalPresenterOwnerController provides newOwner
+    } else {
+        LocalPresenterOwnerController provides owner
+    }
+
     CompositionLocalProvider(
         LocalPresenterController provides controller,
-        LocalPresenterOwnerController provides owner,
+        ownerProvider,
         *providers
     ) {
         content()
     }
 }
 
-fun <Key: Any> PresenterComponentActivity<Key>.setContentWithPresenter(
+fun PresenterComponentActivity.setContentWithPresenter(
     vararg providers: ProvidedValue<*>,
-    controller: PresenterController<Key>,
+    controller: PresenterController<String>,
     canUpdate: Boolean = true,
+    canSaveStateKey: Boolean = true,
     content: @Composable () -> Unit
 ){
     setContent {
@@ -47,6 +62,7 @@ fun <Key: Any> PresenterComponentActivity<Key>.setContentWithPresenter(
             controller = controller,
             owner = presenterStoreOwner,
             canUpdate = canUpdate,
+            canSaveStateKey = canSaveStateKey,
             content = content
         )
     }

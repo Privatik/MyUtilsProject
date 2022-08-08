@@ -17,7 +17,7 @@ import ru.alexgladkov.odyssey.compose.navigation.RootComposeBuilder
 import ru.alexgladkov.odyssey.compose.navigation.modal_navigation.ModalNavigator
 import java.util.*
 
-class MainActivity : PresenterComponentActivity<String>() {
+class MainActivity : PresenterComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +34,7 @@ class MainActivity : PresenterComponentActivity<String>() {
             }
             .build()
 
-        val controller = OdesseyPresenterController(rootController,  presenterStoreOwner)
+        val controller = OdesseyPresenterController(rootController, presenterStoreOwner)
         rootController.setupWithActivity(
             this,
             controller
@@ -72,7 +72,7 @@ class MainActivity : PresenterComponentActivity<String>() {
 
         setContent {
             val navController = rememberNavController()
-            val controller = GooglePresenterController(navController)
+            val controller = GooglePresenterController(navController, presenterStoreOwner)
 
             BackHandler(
                 onBack = {
@@ -89,7 +89,6 @@ class MainActivity : PresenterComponentActivity<String>() {
                 controller = controller,
                 owner = presenterStoreOwner
             ) {
-
                 Navigation(
                     navController = navController
                 )
