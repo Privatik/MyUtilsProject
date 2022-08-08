@@ -4,20 +4,21 @@ import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.io.navigation_common.PresenterController
 import com.io.navigation_common.PresenterStoreOwner
 
-abstract class PresenterComponentActivity<Key: Any>: ComponentActivity(){
+abstract class PresenterComponentActivity: ComponentActivity(){
 
     @Suppress("UNCHECKED_CAST")
-    private val vm: ViewModelForPresenter<Key> by viewModels{
+    private val vm: ViewModelForPresenter by viewModels{
         object: ViewModelProvider.Factory{
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return ViewModelForPresenter<Key>() as T
+                return ViewModelForPresenter() as T
             }
         }
     }
 
-    val presenterStoreOwner: PresenterStoreOwner<Key> by lazy(LazyThreadSafetyMode.NONE) { vm.owner }
+    val presenterStoreOwner: AndroidPresenterStoreOwner by lazy(LazyThreadSafetyMode.NONE) { vm.owner }
 
 
 }

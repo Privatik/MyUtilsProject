@@ -29,7 +29,7 @@ fun RootComposeBuilder.generateGraph() {
         name = Screens.FirstScreen.route,
     ) {
         val controller = LocalRootController.current
-        val firstPresenter: FirstPresenter = presenter(key = Constant.APP_FACTORY)
+        val firstPresenter: FirstPresenter = presenter(createAppComponent())
         FirstScreen{
             controller.push(Screens.SecondScreen.route)
         }
@@ -38,9 +38,8 @@ fun RootComposeBuilder.generateGraph() {
     screen(
         name = Screens.SecondScreen.route,
     ){
-        RebuildConfig{ releaseFull(Constant.NEXT_FACTORY) }
         val controller = LocalRootController.current
-        val secondPresenter: SecondPresenter = presenter(key = Constant.APP_FACTORY)
+        val secondPresenter: SecondPresenter = presenter(createAppComponent())
         val state = secondPresenter.state.collectAsState()
         val snackbarHostState = remember {
             SnackbarHostState()
@@ -77,11 +76,8 @@ fun RootComposeBuilder.generateGraph() {
     screen(
         name = Screens.ThirdScreen.route,
     ){
-        RebuildConfig{
-            put(Constant.NEXT_FACTORY,::createNextComponent)
-        }
         val controller = LocalRootController.current
-        val thirdPresenter: ThirdPresenter = presenter(key = Constant.NEXT_FACTORY)
+        val thirdPresenter: ThirdPresenter = presenter(createNextComponent())
         val state = thirdPresenter.state.collectAsState()
         val adapter = presenterController<OdesseyPresenterController>()
 
@@ -105,7 +101,7 @@ fun RootComposeBuilder.generateGraph() {
         screen(name = Screens.FifthScreen.route) {
 
                 val controller = LocalRootController.current
-                val thirdPresenter: ThirdPresenter = sharedPresenter(key = Constant.NEXT_FACTORY)
+                val thirdPresenter: ThirdPresenter = sharedPresenter(createNextComponent())
                 val state = thirdPresenter.state.collectAsState()
 
                 FifthScreen(
@@ -123,7 +119,7 @@ fun RootComposeBuilder.generateGraph() {
         screen(name = Screens.SixthScreen.route) {
 
                 val controller = LocalRootController.current
-                val thirdPresenter: ThirdPresenter = sharedPresenter(key = Constant.NEXT_FACTORY)
+                val thirdPresenter: ThirdPresenter = sharedPresenter(createNextComponent())
                 val state = thirdPresenter.state.collectAsState()
 
                 SixthScreen(
@@ -140,7 +136,7 @@ fun RootComposeBuilder.generateGraph() {
 
         screen(name = Screens.SeventhScreen.route) {
 
-                val thirdPresenter: ThirdPresenter = presenter(key = Constant.NEXT_FACTORY)
+                val thirdPresenter: ThirdPresenter = presenter(createNextComponent())
                 val state = thirdPresenter.state.collectAsState()
 
                 SeventhScreen(

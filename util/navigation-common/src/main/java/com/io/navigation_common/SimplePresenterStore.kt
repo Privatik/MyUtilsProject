@@ -2,7 +2,7 @@ package com.io.navigation_common
 
 import java.util.concurrent.ConcurrentHashMap
 
-internal class PresenterStore()  {
+internal class SimplePresenterStore()  {
     private val screenWithPresenterMap = HashMap<Class<out UIPresenter>, PresenterBody>()
 
     fun <P: UIPresenter> createOrGetPresenter(
@@ -12,7 +12,7 @@ internal class PresenterStore()  {
         if (screenWithPresenterMap.containsKey(clazz)){
             writeMessage("Get Presenter $clazz")
             @Suppress("UNCHECKED_CAST")
-            return screenWithPresenterMap[clazz] as P
+            return screenWithPresenterMap[clazz]!!.presenter as P
         } else {
             val presenter = factory.create<P>(clazz)
             writeMessage("Add Presenter $clazz")

@@ -1,14 +1,14 @@
 package com.io.navigation_common
 
+import sun.util.resources.Bundles
 import java.util.*
-import kotlin.collections.HashSet
 import kotlin.properties.Delegates
 
-class PresenterStoreOwner<Key: Any>(){
+open class PresenterStoreOwner<Key: Any>(){
     private val sharedPresenterStore = SharedPresenterStore<Key>()
-    private val stores = HashMap<Key, PresenterStore>()
+    private val stores = HashMap<Key, SimplePresenterStore>()
 
-    private val backStack = Stack<Key>()
+    protected val backStack: Stack<Key> = Stack()
 
     private var _currentKey: Key by Delegates.notNull()
     private val currentKey: Key
@@ -31,6 +31,10 @@ class PresenterStoreOwner<Key: Any>(){
         isPop = true
     }
 
+    open fun delete(key: Key){
+
+    }
+
     private fun deleteBackStackUntilKey(key: Key){
         var screen = backStack.peek()
         while (screen != key){
@@ -43,6 +47,7 @@ class PresenterStoreOwner<Key: Any>(){
         backStack.pop()
         stores[screen]?.clear()
         sharedPresenterStore.clearByKey(screen)
+        delete(screen)
     }
 
     fun <P: UIPresenter> createPresenter(
@@ -58,11 +63,11 @@ class PresenterStoreOwner<Key: Any>(){
         }
     }
 
-    private fun createOrGetPresenterStore(): PresenterStore {
+    private fun createOrGetPresenterStore(): SimplePresenterStore {
         stores[currentKey]?.let {
             return it
         }
-        val store = PresenterStore()
+        val store = SimplePresenterStore()
         stores[currentKey] = store
 
         return store

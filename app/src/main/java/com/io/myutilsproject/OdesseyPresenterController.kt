@@ -1,6 +1,8 @@
 package com.io.myutilsproject
 
 import androidx.navigation.NavHostController
+import com.io.navigation.AndroidPresenterController
+import com.io.navigation.AndroidPresenterStoreOwner
 import com.io.navigation_common.PresenterController
 import com.io.navigation_common.PresenterStoreOwner
 import kotlinx.coroutines.flow.*
@@ -10,8 +12,8 @@ import ru.alexgladkov.odyssey.compose.helpers.MultiStackBundle
 
 class OdesseyPresenterController(
     private var controller: RootController,
-    owner: PresenterStoreOwner<String>
-): PresenterController<String>(owner) {
+    owner: AndroidPresenterStoreOwner
+): AndroidPresenterController(owner) {
 
 //    private fun backStack(): List<ScreenInteractor>{
 //        val backStack = RootController::class.java.getDeclaredField("_backstack")
@@ -23,7 +25,6 @@ class OdesseyPresenterController(
 
     private var parentController: RootController? = null
     private var isRestartedParentController = false
-
 
     override val screenFlow: Flow<String>
         get() = controller
@@ -73,8 +74,8 @@ class OdesseyPresenterController(
 
 class GooglePresenterController(
     controller: NavHostController,
-    owner: PresenterStoreOwner<String>
-): PresenterController<String>(owner) {
+    owner: AndroidPresenterStoreOwner
+): AndroidPresenterController(owner) {
 
     override val screenFlow: Flow<String> = controller.currentBackStackEntryFlow.map { it.id }
 }
