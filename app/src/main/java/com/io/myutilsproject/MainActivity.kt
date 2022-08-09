@@ -80,14 +80,15 @@ class MainActivity : PresenterComponentActivity() {
                         finish()
                     } else {
                         navController.popBackStack()
-                        controller.pop()
+                        controller.clearDontUsePresenter()
                     }
                 }
             )
 
             PresenterCompositionLocalProvider(
                 controller = controller,
-                owner = presenterStoreOwner
+                owner = presenterStoreOwner,
+                canSaveStateKey = false
             ) {
                 Navigation(
                     navController = navController

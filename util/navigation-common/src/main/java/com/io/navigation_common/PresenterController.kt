@@ -11,7 +11,7 @@ abstract class PresenterController<Key: Any>(
     protected abstract val screenFlow: Flow<Key>
 
     private fun updateScreen(key: Key) = owner.updateScreen(key)
-    fun pop() { owner.pop() }
+    fun clearDontUsePresenter() { owner.pop() }
 
     protected open suspend fun afterUpdateScreen(key: Key) {}
     protected open suspend fun beforeUpdateScreen(key: Key) {}

@@ -18,11 +18,11 @@ internal class SharedPresenterStore<Key: Any>() {
                 hashSetOf()
             )
             if (!screenWithSharedPresenter.contains(clazz)){
+                println("Presenter-shared add in shared $sharedPresenter")
                 sharedPresenters[clazz] = sharedPresenter.copy(count = sharedPresenter.count + 1)
                 sharedScreenWithSharedPresenter[currentKey]?.apply { add(clazz) }
-                writeMessage("Add SharedPresenter in New screen $clazz count ${sharedPresenter.count + 1}")
             }
-            writeMessage("Get SharedPresenter $clazz")
+            println("Presenter-shared get ${sharedPresenters[clazz]}")
             @Suppress("UNCHECKED_CAST")
             return sharedPresenter.presenter as P
         } else {
@@ -31,8 +31,8 @@ internal class SharedPresenterStore<Key: Any>() {
 
             sharedPresenters[clazz] = SharedPresenterBody(presenter = presenter, clazzFactory = clazzFactory)
             val clazzSet = hashSetOf(clazz)
-            writeMessage("Add SharedPresenter $clazz")
 
+            println("Presenter-shared create ${sharedPresenters[clazz]}")
             sharedScreenWithSharedPresenter[currentKey] = clazzSet
             presenter.build()
             return presenter
@@ -40,19 +40,20 @@ internal class SharedPresenterStore<Key: Any>() {
     }
 
     fun clearByKey(screen: Key){
-        sharedScreenWithSharedPresenter[screen]?.forEach {
-            val sharedPresenter = sharedPresenters[it]!!
+        sharedScreenWithSharedPresenter.remove(screen)?.forEach {
+                val sharedPresenter = sharedPresenters[it]!!
 
-            val count = sharedPresenter.count
-            writeMessage("delete sharedPresenter $count")
+                val count = sharedPresenter.count
 
-            if (count <= 1){
-                sharedPresenters.remove(it)!!.apply {
-                    presenter.clear()
+                if (count <= 1){
+                    println("Presenter-shared remove all $sharedPresenter")
+                    sharedPresenters.remove(it)!!.apply {
+                        presenter.clear()
+                    }
+                } else {
+                    println("Presenter-shared remove one item $sharedPresenter")
+                    sharedPresenters[it] = sharedPresenter.copy(count = count - 1)
                 }
-            } else {
-                sharedPresenters[it] = sharedPresenter.copy(count = count - 1)
             }
-        }
     }
 }
