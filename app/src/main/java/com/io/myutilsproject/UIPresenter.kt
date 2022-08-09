@@ -2,12 +2,13 @@ package com.io.myutilsproject
 
 import com.example.machine.ReducerDSL
 import com.example.machine.reducer
+import com.io.navigation.AndroidPresenter
 import com.io.navigation_common.UIPresenter
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 abstract class Presenter<S: Any, I: Any, E: Any> constructor(private val initState: S):
-    com.io.navigation_common.UIPresenter {
+    AndroidPresenter() {
 
     val presenterScope: CoroutineScope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
 

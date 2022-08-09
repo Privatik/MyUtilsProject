@@ -13,6 +13,14 @@ internal val LocalPresenterOwnerController = compositionLocalOf<PresenterStoreOw
     error("No PresenterStoreOwner provider")
 }
 
+internal val LocalInfoAboutWorkLibrary = compositionLocalOf<InfoAboutWorkLibrary> {
+    InfoAboutWorkLibrary()
+}
+
+internal data class InfoAboutWorkLibrary(
+    val isUseSaveState: Boolean = false
+)
+
 
 @Composable
 fun <A : PresenterController<out Any>> presenterController(): A {

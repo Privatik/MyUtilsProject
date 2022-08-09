@@ -29,7 +29,8 @@ fun RootComposeBuilder.generateGraph() {
         name = Screens.FirstScreen.route,
     ) {
         val controller = LocalRootController.current
-        val firstPresenter: FirstPresenter = presenter(createAppComponent())
+        val appScopePresenter: SharedAppComponentPresenter = sharedPresenter()
+        val firstPresenter: FirstPresenter = presenter(appScopePresenter.factory)
         FirstScreen{
             controller.push(Screens.SecondScreen.route)
         }
@@ -39,8 +40,8 @@ fun RootComposeBuilder.generateGraph() {
         name = Screens.SecondScreen.route,
     ){
         val controller = LocalRootController.current
-        val secondPresenter: SecondPresenter = presenter(createAppComponent())
-        val state = secondPresenter.state.collectAsState()
+        val appScopePresenter: SharedAppComponentPresenter = sharedPresenter()
+        val secondPresenter: SecondPresenter = presenter(appScopePresenter.factory)
         val snackbarHostState = remember {
             SnackbarHostState()
         }
@@ -62,9 +63,9 @@ fun RootComposeBuilder.generateGraph() {
         }
 
         SecondScreen(
-            state = state.value,
-            inc = { secondPresenter.inc(state.value.count) },
-            incGod = { secondPresenter.incGod(state.value.godCount) },
+            body = secondPresenter.state.collectAsState(),
+            inc = { secondPresenter.inc(it) },
+            incGod = { secondPresenter.incGod(it) },
             open = {
                 controller.push(
                     screen = Screens.ThirdScreen.route
@@ -77,16 +78,16 @@ fun RootComposeBuilder.generateGraph() {
         name = Screens.ThirdScreen.route,
     ){
         val controller = LocalRootController.current
-        val thirdPresenter: ThirdPresenter = presenter(createNextComponent())
-        val state = thirdPresenter.state.collectAsState()
+        val nextScopePresenter: SharedNextComponentPresenter = sharedPresenter()
+        val thirdPresenter: ThirdPresenter = presenter(nextScopePresenter.factory)
         val adapter = presenterController<OdesseyPresenterController>()
 
         TripleScreen(
-            state = state.value,
-            inc = { thirdPresenter.inc(state.value.count) },
+            state = thirdPresenter.state.collectAsState(),
+            inc = { thirdPresenter.inc(it) },
             backToFirst = {
                 controller.backToScreen(Screens.FirstScreen.route)
-                adapter.pop()
+                adapter.clearDontUsePresenter()
             },
             next = {
                 controller.present(
@@ -101,7 +102,8 @@ fun RootComposeBuilder.generateGraph() {
         screen(name = Screens.FifthScreen.route) {
 
                 val controller = LocalRootController.current
-                val thirdPresenter: ThirdPresenter = sharedPresenter(createNextComponent())
+            val nextScopePresenter: SharedNextComponentPresenter = sharedPresenter()
+                val thirdPresenter: ThirdPresenter = sharedPresenter(nextScopePresenter.factory)
                 val state = thirdPresenter.state.collectAsState()
 
                 FifthScreen(
@@ -119,7 +121,8 @@ fun RootComposeBuilder.generateGraph() {
         screen(name = Screens.SixthScreen.route) {
 
                 val controller = LocalRootController.current
-                val thirdPresenter: ThirdPresenter = sharedPresenter(createNextComponent())
+            val nextScopePresenter: SharedNextComponentPresenter = sharedPresenter()
+                val thirdPresenter: ThirdPresenter = sharedPresenter(nextScopePresenter.factory)
                 val state = thirdPresenter.state.collectAsState()
 
                 SixthScreen(
@@ -135,8 +138,8 @@ fun RootComposeBuilder.generateGraph() {
         }
 
         screen(name = Screens.SeventhScreen.route) {
-
-                val thirdPresenter: ThirdPresenter = presenter(createNextComponent())
+            val nextScopePresenter: SharedNextComponentPresenter = sharedPresenter()
+                val thirdPresenter: ThirdPresenter = presenter(nextScopePresenter.factory)
                 val state = thirdPresenter.state.collectAsState()
 
                 SeventhScreen(

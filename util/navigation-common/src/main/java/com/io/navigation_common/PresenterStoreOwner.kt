@@ -1,6 +1,5 @@
 package com.io.navigation_common
 
-import sun.util.resources.Bundles
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -27,13 +26,7 @@ open class PresenterStoreOwner<Key: Any>(){
         }
     }
 
-    internal fun pop(){
-        isPop = true
-    }
-
-    open fun delete(key: Key){
-
-    }
+    internal fun pop(){ isPop = true }
 
     private fun deleteBackStackUntilKey(key: Key){
         var screen = backStack.peek()
@@ -47,7 +40,6 @@ open class PresenterStoreOwner<Key: Any>(){
         backStack.pop()
         stores[screen]?.clear()
         sharedPresenterStore.clearByKey(screen)
-        delete(screen)
     }
 
     fun <P: UIPresenter> createPresenter(

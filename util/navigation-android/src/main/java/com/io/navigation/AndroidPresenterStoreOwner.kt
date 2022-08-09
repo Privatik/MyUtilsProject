@@ -4,10 +4,11 @@ import android.os.Bundle
 import androidx.core.os.bundleOf
 import androidx.lifecycle.SavedStateHandle
 import com.io.navigation.Constants.BACKSTACK_KEYS_FOR_PRESENTER
+import com.io.navigation_common.PresenterFactory
 import com.io.navigation_common.PresenterStoreOwner
+import com.io.navigation_common.UIPresenter
 
-class AndroidPresenterStoreOwner: PresenterStoreOwner<String>() {
-
+open class AndroidPresenterStoreOwner: PresenterStoreOwner<String>() {
 
     fun saveState(): Bundle {
         val backArray = Array(backStack.size) { "" }

@@ -1,24 +1,24 @@
 package com.io.myutilsproject.screens.second
 
-import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import com.io.myutilsproject.use
 
 @Composable
 fun SecondScreen(
-    state: SecondState,
-    inc: () -> Unit,
-    incGod: () -> Unit,
+    body: State<SecondState>,
+    inc: (Int) -> Unit,
+    incGod: (Int) -> Unit,
     open: () -> Unit
-){
+) = use(body){ state ->
     val currentConfig = LocalConfiguration.current
 
     Column(
@@ -36,10 +36,10 @@ fun SecondScreen(
         Button(onClick = { open() }) {
             Text(text = "Open")
         }
-        Button(onClick = { inc() }) {
+        Button(onClick = { inc(state.count) }) {
             Text(text = "Inc")
         }
-        Button(onClick = { incGod() }) {
+        Button(onClick = { incGod(state.godCount) }) {
             Text(text = "Inc God")
         }
     }
