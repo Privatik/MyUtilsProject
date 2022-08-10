@@ -23,7 +23,7 @@ abstract class Presenter<S: Any, I: Any, E: Any> constructor(private val initSta
     protected open suspend fun initAction(state: S) = Unit
 
     final override fun build() {
-        val machine = reducer<S, E>(initState, ::initAction, machine())
+        val machine = reducer<S, E>(initState, machine())
         machine.state
             .onEach {
                 _state.emit(it)

@@ -31,7 +31,7 @@ fun <Key: Any> PresenterCompositionLocalProvider(
 
     val ownerProvider = if (canSaveStateKey){
         checkOwnerAsAndroidPresenterOwner(owner)
-        val newOwner = rememberSaveable(saver = PresenterOwnerSaver()) { owner }
+        val newOwner = rememberSaveable(saver = presenterOwnerSaver()) { owner }
         LocalPresenterOwnerController provides newOwner
     } else {
         LocalPresenterOwnerController provides owner
@@ -39,7 +39,6 @@ fun <Key: Any> PresenterCompositionLocalProvider(
 
     CompositionLocalProvider(
         LocalPresenterController provides controller,
-        LocalInfoAboutWorkLibrary provides InfoAboutWorkLibrary(isUseSaveState = canSaveStateKey),
         ownerProvider,
         *providers
     ) {

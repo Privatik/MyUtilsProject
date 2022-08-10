@@ -4,7 +4,6 @@ import kotlinx.coroutines.flow.*
 
 fun <S: Any, E: Any> reducer(
     initState: S,
-    intiAction: suspend (state: S) -> Unit,
     buildReducerDSL: ReducerDSL<S, E>.() -> Unit
 ): Machine<S, E>{
     val initStep = Step<S, E>(initState, null)
@@ -28,8 +27,6 @@ fun <S: Any, E: Any> reducer(
                     }.transform {
                         emit(it.state)
                         it.effect?.run { _effects.emit(this) }
-                    }.onStart {
-                        intiAction(initState)
                     }
             }
     }

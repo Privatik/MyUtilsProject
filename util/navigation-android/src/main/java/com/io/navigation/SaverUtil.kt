@@ -8,25 +8,28 @@ import com.io.navigation_common.PresenterFactory
 import com.io.navigation_common.PresenterStoreOwner
 import com.io.navigation_common.UIPresenter
 
-internal fun PresenterOwnerSaver(): Saver<AndroidPresenterStoreOwner, *> =
+internal fun presenterOwnerSaver(): Saver<AndroidPresenterStoreOwner, *> =
     Saver(
         save = { it.saveState() },
         restore = { AndroidPresenterStoreOwner().apply { restoreState(it) } }
     )
 
-internal fun <P : AndroidPresenter> AndroidPresenterSaver(
-    owner: AndroidPresenterStoreOwner,
+internal fun <P : UIPresenter> PresenterStoreOwner<out Any>.androidPresenterSaver(
     factory: PresenterFactory,
     clazz: Class<out UIPresenter>,
     isShared: Boolean
 ): Saver<P, *> =
     Saver(
-        save = { it.save() },
+        save = { if (it is AndroidPresenter) it.save() else null },
         restore = { bundle ->
-            owner.createPresenter<P>(
+           createPresenter<P>(
                 clazz = clazz,
                 factory = factory,
                 isShared = isShared
-            ).also { it.restore(bundle) }
+            ).also {
+                if (it is AndroidPresenter){
+                    it.restore(bundle)
+                }
+            }
         }
     )
