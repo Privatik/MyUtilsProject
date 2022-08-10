@@ -6,14 +6,22 @@ import com.io.navigation_common.UIPresenter
 import kotlinx.coroutines.flow.Flow
 
 abstract class AndroidPresenter: UIPresenter {
-    protected val savedBundle = Bundle()
+    private var _savedBundle: Bundle? = null
+    protected val savedBundle
+        get() = run {
+            if (_savedBundle == null){
+                _savedBundle = Bundle()
+            }
+            _savedBundle!!
+        }
+
 
     internal fun restore(bundle: Bundle){
-        savedBundle.putAll(bundle)
+        _savedBundle = bundle
     }
 
-    internal fun save(): Bundle{
-        return Bundle(savedBundle)
+    internal fun save(): Bundle?{
+        return _savedBundle
     }
 
 }

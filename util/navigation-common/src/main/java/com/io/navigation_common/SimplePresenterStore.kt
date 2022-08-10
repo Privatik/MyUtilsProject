@@ -23,11 +23,9 @@ internal class SimplePresenterStore()  {
     }
 
     fun clear(){
-        screenWithPresenterMap.forEach { ( clazz, _ ) ->
-            screenWithPresenterMap.remove(clazz)!!.apply {
-                println("Presenter-simple remove all $this")
-                presenter.clear()
-            }
+        screenWithPresenterMap.forEach { ( clazz, presenterBody ) ->
+            println("Presenter-simple remove all $this")
         }
+        screenWithPresenterMap.clear()
     }
 }

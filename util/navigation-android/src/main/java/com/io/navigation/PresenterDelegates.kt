@@ -32,41 +32,9 @@ public fun <P : UIPresenter> presenter(
     checkNotNull(LocalPresenterController.current)
 
     val owner = LocalPresenterOwnerController.current
-    val localInfo = LocalInfoAboutWorkLibrary.current
-
-    return if (localInfo.isUseSaveState)
-        getPresenterWithSave(owner = owner, factory = factory, clazz = clazz, isShared = isShared)
-    else
-        getPresenterWithOutSave(owner = owner, factory = factory, clazz = clazz, isShared = isShared)
-}
-
-@Composable
-private fun <P: UIPresenter> getPresenterWithOutSave(
-    owner: PresenterStoreOwner<out Any>,
-    factory: PresenterFactory,
-    clazz: Class<out UIPresenter>,
-    isShared: Boolean = false
-): P = remember {
-
-    owner.createPresenter<P>(
-        clazz = clazz,
-        factory = factory,
-        isShared = isShared
-    )
-}
-
-@Composable
-private fun <P: AndroidPresenter> getPresenterWithSave(
-    owner: PresenterStoreOwner<out Any>,
-    factory: PresenterFactory,
-    clazz: Class<out UIPresenter>,
-    isShared: Boolean = false
-): P {
-    checkOwnerAsAndroidPresenterOwner(owner)
 
     return rememberSaveable(
-        saver = AndroidPresenterSaver<P>(
-            owner = owner,
+        saver = owner.androidPresenterSaver<P>(
             clazz = clazz,
             factory = factory,
             isShared = isShared
@@ -79,4 +47,3 @@ private fun <P: AndroidPresenter> getPresenterWithSave(
         )
     }
 }
-

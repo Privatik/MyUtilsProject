@@ -31,15 +31,16 @@ open class PresenterStoreOwner<Key: Any>(){
     private fun deleteBackStackUntilKey(key: Key){
         var screen = backStack.peek()
         while (screen != key){
-            backTo(screen)
+            back()
             screen = backStack.peek()
         }
     }
 
-    private fun backTo(screen: Key){
-        backStack.pop()
-        stores[screen]?.clear()
-        sharedPresenterStore.clearByKey(screen)
+    private fun back(){
+        backStack.pop().also { screen ->
+            stores.remove(screen)?.clear()
+            sharedPresenterStore.clearByKey(screen)
+        }
     }
 
     fun <P: UIPresenter> createPresenter(
