@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.*
 
 fun <S: Any, E: Any> reducer(
     initState: S,
+    inItAction: suspend () -> Unit = {},
     buildReducerDSL: ReducerDSL<S, E>.() -> Unit
 ): Machine<S, E>{
     val initStep = Step<S, E>(initState, null)
@@ -19,14 +20,15 @@ fun <S: Any, E: Any> reducer(
                 return dsl.transactions
                     .map { it.everyFlow.map { payload -> Body(payload, it) } }
                     .merge()
-                    .catch { println("Machine Error $it") }
                     .scan(initStep){ oldStep, body ->
                         val newState = body.transaction.render.get(oldStep.state, body.payload)
                         val effect: E? = body.transaction.get(oldStep.state, newState, body.payload)
                         Step(newState, effect)
-                    }.transform {
+                    }.transform<Step<S, E>, S> {
                         emit(it.state)
                         it.effect?.run { _effects.emit(this) }
+                    }.onStart{
+                        inItAction()
                     }
             }
     }

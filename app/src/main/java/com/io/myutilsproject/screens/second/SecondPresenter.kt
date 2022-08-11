@@ -22,7 +22,9 @@ sealed class SecondEffect{
 class SecondPresenter @Inject constructor(
     private val firstRepository: FirstRepository,
     private val secondRepository: SecondRepository,
-): Presenter<SecondState, Any, SecondEffect>(SecondState(godCount = firstRepository.staterInc)) {
+): Presenter<SecondState, Any, SecondEffect>(
+    Pair(SecondState(godCount = firstRepository.staterInc)) {}
+) {
 
     private val inc = MutableSharedFlow<Int>()
     private val incGod = MutableSharedFlow<Int>()
@@ -39,7 +41,7 @@ class SecondPresenter @Inject constructor(
         }
     }
 
-    override fun machine(): ReducerDSL<SecondState, SecondEffect>.() -> Unit = {
+    override fun ReducerDSL<SecondState, SecondEffect>.machine() {
         onEach(
             everyFlow = inc,
             updateState = { oldState, payload ->

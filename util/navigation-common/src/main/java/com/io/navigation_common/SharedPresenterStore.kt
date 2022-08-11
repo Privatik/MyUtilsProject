@@ -34,7 +34,6 @@ internal class SharedPresenterStore<Key: Any>() {
 
             println("Presenter-shared create ${sharedPresenters[clazz]}")
             sharedScreenWithSharedPresenter[currentKey] = clazzSet
-            presenter.build()
             return presenter
         }
     }

@@ -17,14 +17,14 @@ internal class SimplePresenterStore()  {
             val presenter = factory.create<P>(clazz)
             screenWithPresenterMap[clazz] = PresenterBody(presenter, factory::class.java)
             println("Presenter-simple create ${screenWithPresenterMap[clazz]}")
-            presenter.build()
             return presenter
         }
     }
 
     fun clear(){
-        screenWithPresenterMap.forEach { ( clazz, presenterBody ) ->
+        screenWithPresenterMap.forEach { ( _, presenterBody ) ->
             println("Presenter-simple remove all $this")
+            presenterBody.presenter.clear()
         }
         screenWithPresenterMap.clear()
     }

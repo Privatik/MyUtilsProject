@@ -12,7 +12,7 @@ data class ThirdState(
     val count: Int = 0
 )
 
-class ThirdPresenter @Inject constructor(): Presenter<ThirdState, Any, Any>(ThirdState()) {
+class ThirdPresenter @Inject constructor(): Presenter<ThirdState, Any, Any>(Pair(ThirdState()) {}) {
 
     private val inc = MutableSharedFlow<Int>()
 
@@ -22,7 +22,7 @@ class ThirdPresenter @Inject constructor(): Presenter<ThirdState, Any, Any>(Thir
         }
     }
 
-    override fun machine(): ReducerDSL<ThirdState, Any>.() -> Unit = {
+    override fun ReducerDSL<ThirdState, Any>.machine() {
         onEach(
             everyFlow = inc,
             updateState = { oldState, payload -> oldState.copy(count = payload) }
