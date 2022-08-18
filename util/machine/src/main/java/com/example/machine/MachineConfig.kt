@@ -24,7 +24,7 @@ fun <S: Any, E: Any> reducer(
                         val newState = body.transaction.render.get(oldStep.state, body.payload)
                         val effect: E? = body.transaction.get(oldStep.state, newState, body.payload)
                         Step(newState, effect)
-                    }.transform<Step<S, E>, S> {
+                    }.transform {
                         emit(it.state)
                         it.effect?.run { _effects.emit(this) }
                     }.onStart{

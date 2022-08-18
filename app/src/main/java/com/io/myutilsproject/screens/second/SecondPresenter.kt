@@ -5,7 +5,6 @@ import com.example.machine.ReducerDSL
 import com.io.myutilsproject.Presenter
 import com.io.myutilsproject.repository.FirstRepository
 import com.io.myutilsproject.repository.SecondRepository
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,18 +25,19 @@ class SecondPresenter @Inject constructor(
     Pair(SecondState(godCount = firstRepository.staterInc)) {}
 ) {
 
-    private val inc = MutableSharedFlow<Int>()
-    private val incGod = MutableSharedFlow<Int>()
+    private val inc = saveHandle.handleAsFlow<Int>("inc")
+    private val incGod = saveHandle.handleAsFlow<Int>("incGod")
+
 
     fun inc(count: Int){
         presenterScope.launch {
-            inc.emit(count + 1)
+            saveHandle.put("inc", count + 1)
         }
     }
 
     fun incGod(count: Int){
         presenterScope.launch {
-            incGod.emit(count + 1)
+            saveHandle.put("incGod", count + 1)
         }
     }
 

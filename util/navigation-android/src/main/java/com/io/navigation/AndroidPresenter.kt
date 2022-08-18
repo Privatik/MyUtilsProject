@@ -1,27 +1,25 @@
 package com.io.navigation
 
 import android.os.Bundle
-import androidx.lifecycle.SavedStateHandle
 import com.io.navigation_common.UIPresenter
-import kotlinx.coroutines.flow.Flow
 
 abstract class AndroidPresenter: UIPresenter {
-    private var _savedBundle: Bundle? = null
-    protected val savedBundle
+    private var _saveHandle: SaveHandle? = null
+    protected val saveHandle
         get() = run {
-            if (_savedBundle == null){
-                _savedBundle = Bundle()
+            if (_saveHandle == null){
+                _saveHandle = SaveHandle(Bundle())
             }
-            _savedBundle!!
+            _saveHandle!!
         }
 
 
     internal fun restore(bundle: Bundle){
-        _savedBundle = bundle
+        saveHandle.update(bundle)
     }
 
     internal fun save(): Bundle?{
-        return _savedBundle
+        return _saveHandle?.getBundle()
     }
 
 }
