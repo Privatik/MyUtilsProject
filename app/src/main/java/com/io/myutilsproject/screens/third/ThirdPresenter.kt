@@ -14,11 +14,11 @@ data class ThirdState(
 
 class ThirdPresenter @Inject constructor(): Presenter<ThirdState, Any, Any>(Pair(ThirdState()) {}) {
 
-    private val inc = MutableSharedFlow<Int>()
+    private val inc = saveHandle.handleAsFlow<Int>("inc")
 
     fun inc(count: Int){
         presenterScope.launch {
-            inc.emit(count + 1)
+            saveHandle.put("inc", count + 1)
         }
     }
 
