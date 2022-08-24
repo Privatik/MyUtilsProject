@@ -26,8 +26,6 @@ class SecondPresenter @Inject constructor(
 ) {
 
     private val inc = saveHandle.handleAsFlow<Int>("inc")
-    private val incGod = saveHandle.handleAsFlow<Int>("incGod")
-
 
     fun inc(count: Int){
         presenterScope.launch {
@@ -58,7 +56,7 @@ class SecondPresenter @Inject constructor(
         )
 
         onEach(
-            everyFlow = incGod,
+            everyFlow = saveHandle.handleAsFlow<Int>("incGod"),
             action = { _, _, payload ->
                 firstRepository.inc(payload)
             }

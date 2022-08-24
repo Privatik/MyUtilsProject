@@ -87,8 +87,7 @@ class MainActivity : PresenterComponentActivity() {
 
             PresenterCompositionLocalProvider(
                 controller = controller,
-                owner = presenterStoreOwner,
-                canSaveStateKey = false
+                owner = presenterStoreOwner
             ) {
                 Navigation(
                     navController = navController

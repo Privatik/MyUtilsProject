@@ -9,15 +9,13 @@ open class PresenterStoreOwner<Key: Any>(){
 
     protected val backStack: Stack<Key> = Stack()
 
-    private var _currentKey: Key by Delegates.notNull()
     private val currentKey: Key
-        get() = _currentKey
+        get() = backStack.peek()
 
     @Volatile
     private var isPop = false
 
     internal fun updateScreen(key: Key){
-        _currentKey = key
         if (isPop){
             isPop = false
             deleteBackStackUntilKey(key)
