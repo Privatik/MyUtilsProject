@@ -10,32 +10,44 @@ import kotlinx.coroutines.flow.flowOf
 class SaveHandle(
     private val bundle: Bundle
 ) {
-    private val keys = hashSetOf<String>()
     private val flowMap = hashMapOf<String, MutableSharedFlow<Any>>()
 
     fun <T: Any> handleAsFlow(key: String): Flow<T> {
         @Suppress("UNCHECKED_CAST")
         return flowMap.getOrElse(key){
-            val flow = MutableSharedFlow<Any>()
+            val flow = MutableSharedFlow<Any>(replay = 1)
             flowMap[key] = flow
+            bundle.get(key)?.let { value ->
+                flow.tryEmit(value)
+            }
             flow
         } as Flow<T>
     }
 
-    suspend fun <T: Any> put(key: String, body: T){
+    suspend fun <T: Any> put(
+        key: String,
+        body: T,
+        isSendToFlow: Boolean = true
+    ){
         putInBundle(key, body)
-        flowMap[key]?.emit(body)
-
+        if (isSendToFlow){
+            flowMap[key]?.emit(body)
+        }
     }
 
-    fun <T: Any> tryPut(key: String, body: T){
+    fun <T: Any> tryPut(
+        key: String,
+        body: T,
+        isSendToFlow: Boolean = true
+    ){
         putInBundle(key, body)
-        flowMap[key]?.tryEmit(body)
+        if (isSendToFlow){
+            flowMap[key]?.tryEmit(body)
+        }
     }
 
     @Synchronized
     private fun <T: Any> putInBundle(key: String, body: T) {
-        keys.add(key)
         bundle.putAll(bundleOf(key to body))
     }
 
@@ -46,6 +58,11 @@ class SaveHandle(
 
     fun update(bundle: Bundle){
         this.bundle.putAll(bundle)
+        flowMap.forEach { (key, flow) ->
+            bundle.get(key)?.let { value ->
+                flow.tryEmit(value)
+            }
+        }
     }
 
     fun getBundle(): Bundle{
