@@ -31,7 +31,7 @@ fun <Key: Any> PresenterCompositionLocalProvider(
 
     val ownerProvider = if (canSaveStateKey){
         checkOwnerAsAndroidPresenterOwner(owner)
-        val newOwner = rememberSaveable(saver = presenterOwnerSaver()) { owner }
+        val newOwner = rememberSaveable(saver = presenterOwnerSaver(owner)) { owner }
         LocalPresenterOwnerController provides newOwner
     } else {
         LocalPresenterOwnerController provides owner
