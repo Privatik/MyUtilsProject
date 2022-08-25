@@ -8,10 +8,10 @@ import com.io.navigation_common.PresenterFactory
 import com.io.navigation_common.PresenterStoreOwner
 import com.io.navigation_common.UIPresenter
 
-internal fun presenterOwnerSaver(): Saver<AndroidPresenterStoreOwner, *> =
+internal fun presenterOwnerSaver(owner: AndroidPresenterStoreOwner): Saver<AndroidPresenterStoreOwner, *> =
     Saver(
         save = { it.saveState() },
-        restore = { AndroidPresenterStoreOwner().apply { restoreState(it) } }
+        restore = { owner.apply { restoreState(it) } }
     )
 
 internal fun <P : UIPresenter> PresenterStoreOwner<out Any>.androidPresenterSaver(
