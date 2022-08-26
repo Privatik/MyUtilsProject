@@ -24,7 +24,6 @@ fun RootController.setupWithActivity(
     dispatcher.addCallback(object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             rootDispatcher.onBackPressed()
-            adapter.clearNotUsedPresenters()
         }
     })
 

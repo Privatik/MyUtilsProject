@@ -3,17 +3,17 @@ package com.io.navigation_common
 import java.util.*
 import kotlin.properties.Delegates
 
-open class PresenterStoreOwner<Key: Any>(){
+open class PresenterStoreOwner<Key: Any>(
+    private val keyBackStack: PresenterBackStack<Key> = KeyBackStack()
+){
     private val sharedPresenterStore = SharedPresenterStore<Key>()
     private val stores = HashMap<Key, SimplePresenterStore>()
 
-    protected val backStack: Stack<Key> = Stack()
+    protected val backStack: Stack<Key>
+        get() = keyBackStack.backStack
 
     private val currentKey: Key
         get() = backStack.peek()
-
-    @Volatile
-    private var isPop = false
 
     protected fun saveInfoAboutShared(): Map<String, HashSet<Key>>{
         return sharedPresenterStore.save()
@@ -24,29 +24,14 @@ open class PresenterStoreOwner<Key: Any>(){
     }
 
     internal fun updateScreen(key: Key){
-        if (isPop){
-            isPop = false
-            deleteBackStackUntilKey(key)
-        } else {
-            backStack.push(key)
+        keyBackStack.navigateOrPop(key){ deleteKey ->
+            back(deleteKey)
         }
     }
 
-    internal fun pop(){ isPop = true }
-
-    private fun deleteBackStackUntilKey(key: Key){
-        var screen = backStack.peek()
-        while (screen != key){
-            back()
-            screen = backStack.peek()
-        }
-    }
-
-    private fun back(){
-        backStack.pop().also { screen ->
-            stores.remove(screen)?.clear()
-            sharedPresenterStore.clearByKey(screen)
-        }
+    private fun back(deleteKey: Key){
+        stores.remove(deleteKey)?.clear()
+        sharedPresenterStore.clearByKey(deleteKey)
     }
 
     fun <P: UIPresenter> createPresenter(
