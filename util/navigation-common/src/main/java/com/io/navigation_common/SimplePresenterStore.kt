@@ -10,20 +10,31 @@ internal class SimplePresenterStore()  {
         factory: PresenterFactory
     ): P {
         if (screenWithPresenterMap.containsKey(clazz)){
-            println("Presenter-simple get ${screenWithPresenterMap[clazz]}")
             @Suppress("UNCHECKED_CAST")
-            return screenWithPresenterMap[clazz]!!.presenter as P
+            return getPresenter(clazz)
         } else {
-            val presenter = factory.create<P>(clazz)
-            screenWithPresenterMap[clazz] = PresenterBody(presenter, factory::class.java)
-            println("Presenter-simple create ${screenWithPresenterMap[clazz]}")
-            return presenter
+            return createPresenter(clazz, factory)
         }
+    }
+
+    private fun <P: UIPresenter> createPresenter(
+        clazz: Class<out UIPresenter>,
+        factory: PresenterFactory
+    ):P{
+        val presenter = factory.create<P>(clazz)
+        screenWithPresenterMap[clazz] = PresenterBody(presenter, factory::class.java)
+        return presenter
+    }
+
+    private fun  <P: UIPresenter> getPresenter(
+        clazz: Class<out UIPresenter>
+    ):P{
+        @Suppress("UNCHECKED_CAST")
+        return screenWithPresenterMap[clazz]!!.presenter as P
     }
 
     fun clear(){
         screenWithPresenterMap.forEach { ( _, presenterBody ) ->
-            println("Presenter-simple remove all $this")
             presenterBody.presenter.clear()
         }
         screenWithPresenterMap.clear()

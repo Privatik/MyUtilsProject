@@ -15,6 +15,14 @@ open class PresenterStoreOwner<Key: Any>(){
     @Volatile
     private var isPop = false
 
+    protected fun saveInfoAboutShared(): Map<String, HashSet<Key>>{
+        return sharedPresenterStore.save()
+    }
+
+    protected fun restoreInfoAboutShared(retainKeys: Map<String, HashSet<Key>>){
+        sharedPresenterStore.restore(retainKeys)
+    }
+
     internal fun updateScreen(key: Key){
         if (isPop){
             isPop = false
