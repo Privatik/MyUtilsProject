@@ -87,7 +87,6 @@ fun RootComposeBuilder.generateGraph() {
             inc = { thirdPresenter.inc(it) },
             backToFirst = {
                 controller.backToScreen(Screens.FirstScreen.route)
-                adapter.clearNotUsedPresenters()
             },
             next = {
                 controller.present(

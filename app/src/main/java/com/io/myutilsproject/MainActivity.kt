@@ -80,7 +80,6 @@ class MainActivity : PresenterComponentActivity() {
                         finish()
                     } else {
                         navController.popBackStack()
-                        controller.clearNotUsedPresenters()
                     }
                 }
             )

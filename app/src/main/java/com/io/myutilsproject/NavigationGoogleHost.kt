@@ -81,7 +81,6 @@ fun Navigation(
                 inc = { thirdPresenter.inc(it) },
                 backToFirst = {
                     navController.popBackStack(Screens.FirstScreen.route, false)
-                    adapter.clearNotUsedPresenters()
                 },
                 next = {
 
