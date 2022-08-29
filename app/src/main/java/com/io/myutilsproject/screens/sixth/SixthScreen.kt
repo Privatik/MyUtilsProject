@@ -9,13 +9,13 @@ import com.io.myutilsproject.screens.third.ThirdState
 @Composable
 fun SixthScreen(
     state: ThirdState,
-    inc: () -> Unit,
+    inc: (Int) -> Unit,
     open: () -> Unit
 ){
     Column() {
         Text("SixthScreen")
         Text("state ${state.count}")
-        Button(onClick = { inc() }) {
+        Button(onClick = { inc(state.count) }) {
             
         }
         Button(onClick = { open() }) {
