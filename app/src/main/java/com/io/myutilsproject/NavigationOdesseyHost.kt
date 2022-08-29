@@ -5,6 +5,7 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
+import com.io.myutilsproject.screens.fifth.FifthPresenter
 import com.io.myutilsproject.screens.fifth.FifthScreen
 import com.io.myutilsproject.screens.first.FirstPresenter
 import com.io.myutilsproject.screens.first.FirstScreen
@@ -12,6 +13,7 @@ import com.io.myutilsproject.screens.second.SecondEffect
 import com.io.myutilsproject.screens.second.SecondPresenter
 import com.io.myutilsproject.screens.second.SecondScreen
 import com.io.myutilsproject.screens.seventh.SeventhScreen
+import com.io.myutilsproject.screens.sixth.SixthPresenter
 import com.io.myutilsproject.screens.sixth.SixthScreen
 import com.io.myutilsproject.screens.third.ThirdPresenter
 import com.io.myutilsproject.screens.third.TripleScreen
@@ -42,6 +44,7 @@ fun RootComposeBuilder.generateGraph() {
         val controller = LocalRootController.current
         val appScopePresenter: SharedAppComponentPresenter = sharedPresenter()
         val secondPresenter: SecondPresenter = presenter(appScopePresenter.factory)
+        val fifthPresenter: FifthPresenter = presenter(tag = "SHARED")
         val snackbarHostState = remember {
             SnackbarHostState()
         }
@@ -64,12 +67,16 @@ fun RootComposeBuilder.generateGraph() {
 
         SecondScreen(
             body = secondPresenter.state.collectAsState(),
+            bodyT = fifthPresenter.state.collectAsState(),
             inc = { secondPresenter.inc(it) },
             incGod = { secondPresenter.incGod(it) },
             open = {
                 controller.push(
                     screen = Screens.ThirdScreen.route
                 )
+            },
+            incTag = {
+                fifthPresenter.inc(it)
             }
         )
     }
@@ -80,19 +87,22 @@ fun RootComposeBuilder.generateGraph() {
         val controller = LocalRootController.current
         val nextScopePresenter: SharedNextComponentPresenter = sharedPresenter()
         val thirdPresenter: ThirdPresenter = presenter(nextScopePresenter.factory)
+        val sixthPresenter: SixthPresenter = presenter(tag = "SHARED")
+
         val adapter = presenterController<OdesseyPresenterController>()
 
         TripleScreen(
             state = thirdPresenter.state.collectAsState(),
+            stateT = sixthPresenter.state.collectAsState(),
             inc = { thirdPresenter.inc(it) },
             backToFirst = {
                 controller.backToScreen(Screens.FirstScreen.route)
             },
             next = {
-                controller.present(
-                    screen = Screens.FourScreen.route,
-                    startScreen = Screens.FifthScreen.route
-                )
+
+            },
+            incT = {
+                sixthPresenter.inc(it)
             }
         )
     }

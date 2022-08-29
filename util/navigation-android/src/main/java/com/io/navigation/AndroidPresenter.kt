@@ -22,4 +22,8 @@ abstract class AndroidPresenter: UIPresenter {
         return _saveHandle?.getBundle()
     }
 
+    open override fun clear() {
+        TODO("Not yet implemented")
+    }
+
 }

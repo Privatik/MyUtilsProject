@@ -15,6 +15,7 @@ internal fun presenterOwnerSaver(owner: AndroidPresenterStoreOwner): Saver<Andro
     )
 
 internal fun <P : UIPresenter> PresenterStoreOwner<out Any>.androidPresenterSaver(
+    tag: String? = null,
     factory: PresenterFactory,
     clazz: Class<out UIPresenter>,
     isShared: Boolean
@@ -23,6 +24,7 @@ internal fun <P : UIPresenter> PresenterStoreOwner<out Any>.androidPresenterSave
         save = { if (it is AndroidPresenter) it.save() else null },
         restore = { bundle ->
            createPresenter<P>(
+                tag = tag,
                 clazz = clazz,
                 factory = factory,
                 isShared = isShared
