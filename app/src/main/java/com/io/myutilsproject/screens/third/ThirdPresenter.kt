@@ -22,7 +22,7 @@ class ThirdPresenter @Inject constructor(): Presenter<ThirdState, Any, Any>(Pair
         }
     }
 
-    override fun ReducerDSL<ThirdState, Any>.machine() {
+    override fun ReducerDSL<ThirdState, Any>.reducer() {
         onEach(
             everyFlow = inc,
             updateState = { oldState, payload -> oldState.copy(count = payload) }

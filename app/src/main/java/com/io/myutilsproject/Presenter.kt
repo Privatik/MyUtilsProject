@@ -3,7 +3,6 @@ package com.io.myutilsproject
 import com.example.machine.ReducerDSL
 import com.example.machine.reducer
 import com.io.navigation.AndroidPresenter
-import com.io.navigation_common.UIPresenter
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -22,10 +21,10 @@ abstract class Presenter<S: Any, I: Any, E: Any>(
     private val _singleEffect = MutableSharedFlow<E>()
     val singleEffect = _singleEffect.asSharedFlow()
 
-    protected abstract fun ReducerDSL<S, E>.machine()
+    protected abstract fun ReducerDSL<S, E>.reducer()
 
     private fun build(initBody: Pair<S, suspend () -> Unit>){
-        reducer<S, E>(initBody.first, initBody.second) { machine() }.apply {
+        reducer<S, E>(initBody.first, initBody.second){ reducer() }.apply {
             state
                 .onEach {
                     _state.emit(it)

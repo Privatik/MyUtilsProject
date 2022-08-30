@@ -2,12 +2,10 @@ package com.io.navigation
 
 import android.os.Bundle
 import androidx.core.os.bundleOf
-import androidx.lifecycle.SavedStateHandle
 import com.io.navigation.Constants.BACKSTACK_KEYS_FOR_PRESENTER
 import com.io.navigation.Constants.RETAIN_PRESENTERS
-import com.io.navigation_common.PresenterFactory
+import com.io.navigation.Constants.RETAIN_PRESENTERS_BY_TAG
 import com.io.navigation_common.PresenterStoreOwner
-import com.io.navigation_common.UIPresenter
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -16,37 +14,35 @@ import kotlin.collections.HashSet
 open class AndroidPresenterStoreOwner: PresenterStoreOwner<String>() {
 
     fun saveState(): Bundle {
-        val retainInfo = saveInfoAboutShared()
+        val retainInfo = restorePresenterStoreOwner.saveInfoAboutShared()
+        val retainTag = restorePresenterStoreOwner.saveInfoAboutTag()
+        val backList = restorePresenterStoreOwner.saveInfoAboutBackStack()
 
-        val backArray = Array(backStack.size) { "" }
         val retainPresenters = LinkedList<String>()
-        backStack.forEachIndexed { index, s ->
-            backArray[index] = s
-        }
+        val retainPresentersByTag = LinkedList<String>()
 
-        val bundle = bundleOf(BACKSTACK_KEYS_FOR_PRESENTER to backArray)
+        val bundle = bundleOf(BACKSTACK_KEYS_FOR_PRESENTER to backList)
         retainInfo.forEach { (presenter, setScreens) ->
             retainPresenters.add(presenter)
             bundle.putStringArrayList(presenter, ArrayList(setScreens.toList()))
         }
+        retainTag.forEach { (tag, key) ->
+            retainPresentersByTag.add(tag)
+            bundle.putString(tag, key)
+        }
         bundle.putStringArrayList(RETAIN_PRESENTERS, ArrayList(retainPresenters))
+        bundle.putStringArrayList(RETAIN_PRESENTERS_BY_TAG, ArrayList(retainPresentersByTag))
 
         return bundle
     }
 
     fun restoreState(bundle: Bundle){
-        val backArray = bundle.getStringArray(BACKSTACK_KEYS_FOR_PRESENTER)
+        val backList = bundle.getStringArrayList(BACKSTACK_KEYS_FOR_PRESENTER) as List<String>
         val retainList = bundle.getStringArrayList(RETAIN_PRESENTERS)
-
-        checkNotNull(backArray){
-            "backStack not parse"
-        }
+        val retainListByTag = bundle.getStringArrayList(RETAIN_PRESENTERS_BY_TAG)
 
         val retainKeys = HashMap<String, HashSet<String>>()
-
-        backArray.forEach {
-            backStack.push(it)
-        }
+        val retainKeysByTag = HashMap<String, String>()
 
         retainList?.forEach {
             bundle.getStringArrayList(it)?.toSet()?.let { set ->
@@ -54,6 +50,14 @@ open class AndroidPresenterStoreOwner: PresenterStoreOwner<String>() {
             }
         }
 
-        restoreInfoAboutShared(retainKeys)
+        retainListByTag?.forEach {
+            bundle.getString(it)?.let { key ->
+                retainKeysByTag[it] = key
+            }
+        }
+
+        restorePresenterStoreOwner.restoreInfoAboutBackStack(backList)
+        restorePresenterStoreOwner.restoreInfoAboutShared(retainKeys)
+        restorePresenterStoreOwner.restoreInfoAboutTag(retainKeysByTag)
     }
 }

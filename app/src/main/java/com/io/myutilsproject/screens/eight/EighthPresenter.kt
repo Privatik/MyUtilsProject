@@ -6,7 +6,7 @@ import com.io.myutilsproject.screens.third.ThirdState
 
 class EighthPresenter: Presenter<ThirdState, Any, Any>(ThirdState() to {}) {
 
-    override fun ReducerDSL<ThirdState, Any>.machine() {
+    override fun ReducerDSL<ThirdState, Any>.reducer() {
 
     }
 }

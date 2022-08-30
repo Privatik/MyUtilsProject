@@ -13,7 +13,7 @@ class FifthPresenter: Presenter<ThirdState, Any, Any>(ThirdState() to {}) {
         }
     }
 
-    override fun ReducerDSL<ThirdState, Any>.machine() {
+    override fun ReducerDSL<ThirdState, Any>.reducer() {
         onEach(
             everyFlow = saveHandle.handleAsFlow<Int>("inc"),
             updateState = { oldState, payload -> oldState.copy(count = payload) }
