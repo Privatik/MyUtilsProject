@@ -46,7 +46,7 @@ fun SecondScreen(
         Button(onClick = { incGod(state.godCount) }) {
             Text(text = "Inc God")
         }
-        Button(onClick = { incTag(state.godCount) }) {
+        Button(onClick = { incTag(stateT.count) }) {
             Text(text = "Inc by tag God")
         }
     }

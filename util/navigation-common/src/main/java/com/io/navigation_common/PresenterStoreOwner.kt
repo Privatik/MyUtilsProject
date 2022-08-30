@@ -5,7 +5,7 @@ import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 
 open class PresenterStoreOwner<Key: Any>(
-    private val keyBackStack: PresenterBackStack<Key> = KeyBackStack()
+    private val keyBackStack: PresenterBackStack<Key> = KeyBackStack(),
 ){
     private val sharedPresenterStore = SharedPresenterStore<Key>()
     private val simpleStores = HashMap<Key, SimplePresenterStore>()
@@ -13,30 +13,28 @@ open class PresenterStoreOwner<Key: Any>(
     private val keyTag = HashMap<String, Key>()
     private val tagsStores = HashMap<Key, TagPresenterStore>()
 
-    protected val backStack: Stack<Key>
+    private val backStack: Stack<Key>
         get() = keyBackStack.backStack
 
     private val currentKey: Key
         get() = backStack.peek()
 
-    protected fun saveInfoAboutShared(): Map<String, HashSet<Key>>{
-        return sharedPresenterStore.save()
-    }
+    protected val restorePresenterStoreOwner: RestorePresenterStoreOwner<Key> = DefaultRestorePresenterStoreOwner(
+        presenterBackStack = keyBackStack,
+        keyTag = keyTag,
+        sharedPresenterStore = sharedPresenterStore
+    )
 
-    protected fun restoreInfoAboutShared(retainKeys: Map<String, HashSet<Key>>){
-        sharedPresenterStore.restore(retainKeys)
-    }
-
-    internal fun updateScreen(key: Key){
+    internal fun updateCurrentScreen(key: Key){
         keyBackStack.navigateOrPop(key){ deleteKey ->
-            back(deleteKey)
+            removeUnnecessaryPresenters(deleteKey)
         }
     }
 
-    private fun back(deleteKey: Key){
+    private fun removeUnnecessaryPresenters(deleteKey: Key){
         simpleStores.remove(deleteKey)?.clear()
         sharedPresenterStore.clearByKey(deleteKey)
-        tagsStores.remove(currentKey)?.apply {
+        tagsStores.remove(deleteKey)?.apply {
             keyTag.remove(tag)
             clear()
         }

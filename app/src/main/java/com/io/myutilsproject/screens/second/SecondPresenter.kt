@@ -40,7 +40,7 @@ class SecondPresenter @Inject constructor(
         }
     }
 
-    override fun ReducerDSL<SecondState, SecondEffect>.machine() {
+    override fun ReducerDSL<SecondState, SecondEffect>.reducer() {
         onEach(
             everyFlow = saveHandle.handleAsFlow<Int>("inc"),
             updateState = { oldState, payload ->

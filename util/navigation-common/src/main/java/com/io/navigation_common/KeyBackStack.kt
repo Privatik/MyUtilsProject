@@ -7,6 +7,9 @@ interface PresenterBackStack<Key: Any>{
     val backStack: Stack<Key>
     fun navigateOrPop(key: Key, removeByKey:(Key) -> Unit)
 
+    fun restoreBackStack(backStack: List<Key>)
+    fun saveBackStack(): List<Key>
+
 }
 
 internal class KeyBackStack<Key: Any>: PresenterBackStack<Key> {
@@ -19,6 +22,7 @@ internal class KeyBackStack<Key: Any>: PresenterBackStack<Key> {
                 deleteBackStackUntilKey(key, removeByKey)
             }
         } else {
+            println("BACK add $key")
             backStack.push(key)
             keySets.add(key)
         }
@@ -28,10 +32,26 @@ internal class KeyBackStack<Key: Any>: PresenterBackStack<Key> {
         var screen = backStack.peek()
         while (screen != key){
             keySets.remove(screen)
+            println("BACK remove $screen")
             removeByKey(backStack.pop())
             if (backStack.isEmpty()) break
             screen = backStack.peek()
         }
+    }
+
+    override fun restoreBackStack(backStack: List<Key>) {
+        backStack.forEach {
+            this.backStack.push(it)
+            keySets.add(it)
+        }
+    }
+
+    override fun saveBackStack(): List<Key> {
+        val list= LinkedList<Key>()
+        backStack.forEach {
+            list.add(it)
+        }
+        return list
     }
 
 
