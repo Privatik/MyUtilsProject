@@ -81,7 +81,6 @@ fun Navigation(
 
         composable(Screens.ThirdScreen.route){
             val nextScopePresenter: SharedNextComponentPresenter = sharedPresenter()
-            println("Presenter create third screen")
             val thirdPresenter: ThirdPresenter = presenter(nextScopePresenter.factory)
             val sixthPresenter: SixthPresenter = presenter(tag = "SHARED")
             val adapter = presenterController<GooglePresenterController>()

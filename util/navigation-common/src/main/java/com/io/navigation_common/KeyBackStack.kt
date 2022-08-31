@@ -22,7 +22,6 @@ internal class KeyBackStack<Key: Any>: PresenterBackStack<Key> {
                 deleteBackStackUntilKey(key, removeByKey)
             }
         } else {
-            println("BACK add $key")
             backStack.push(key)
             keySets.add(key)
         }
@@ -32,7 +31,6 @@ internal class KeyBackStack<Key: Any>: PresenterBackStack<Key> {
         var screen = backStack.peek()
         while (screen != key){
             keySets.remove(screen)
-            println("BACK remove $screen")
             removeByKey(backStack.pop())
             if (backStack.isEmpty()) break
             screen = backStack.peek()
