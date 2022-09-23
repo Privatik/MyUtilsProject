@@ -15,8 +15,8 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/util" />
             <option value="$PROJECT_DIR$/util/machine" />
-            <option value="$PROJECT_DIR$/util/navigation-android" />
-            <option value="$PROJECT_DIR$/util/navigation-common" />
+            <option value="$PROJECT_DIR$/util/presenter-android" />
+            <option value="$PROJECT_DIR$/util/presenter-common" />
           </set>
         </option>
       </GradleProjectSettings>
