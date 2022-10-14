@@ -25,5 +25,5 @@ task clean(type: Delete) {
 }
 
 ext{
-    versionName = "1.0.0-beta"
+    versionName = "1.0.1-beta"
 }

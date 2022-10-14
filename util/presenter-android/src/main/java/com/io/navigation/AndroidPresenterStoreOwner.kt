@@ -21,7 +21,7 @@ open class AndroidPresenterStoreOwner: PresenterStoreOwner<String>() {
         val retainPresenters = LinkedList<String>()
         val retainPresentersByTag = LinkedList<String>()
 
-        val bundle = bundleOf(BACKSTACK_KEYS_FOR_PRESENTER to backList)
+        val bundle = Bundle()
         retainInfo.forEach { (presenter, setScreens) ->
             retainPresenters.add(presenter)
             bundle.putStringArrayList(presenter, ArrayList(setScreens.toList()))
@@ -30,6 +30,8 @@ open class AndroidPresenterStoreOwner: PresenterStoreOwner<String>() {
             retainPresentersByTag.add(tag)
             bundle.putString(tag, key)
         }
+
+        bundle.putStringArrayList(BACKSTACK_KEYS_FOR_PRESENTER, ArrayList(backList))
         bundle.putStringArrayList(RETAIN_PRESENTERS, ArrayList(retainPresenters))
         bundle.putStringArrayList(RETAIN_PRESENTERS_BY_TAG, ArrayList(retainPresentersByTag))
 
@@ -37,7 +39,7 @@ open class AndroidPresenterStoreOwner: PresenterStoreOwner<String>() {
     }
 
     fun restoreState(bundle: Bundle){
-        val backList = bundle.getStringArrayList(BACKSTACK_KEYS_FOR_PRESENTER) as List<String>
+        val backList = bundle.getStringArrayList(BACKSTACK_KEYS_FOR_PRESENTER) ?: emptyList()
         val retainList = bundle.getStringArrayList(RETAIN_PRESENTERS)
         val retainListByTag = bundle.getStringArrayList(RETAIN_PRESENTERS_BY_TAG)
 
@@ -56,7 +58,7 @@ open class AndroidPresenterStoreOwner: PresenterStoreOwner<String>() {
             }
         }
 
-        restorePresenterStoreOwner.restoreInfoAboutBackStack(backList)
+        restorePresenterStoreOwner.restoreInfoAboutBackStack(backList.toList())
         restorePresenterStoreOwner.restoreInfoAboutShared(retainKeys)
         restorePresenterStoreOwner.restoreInfoAboutTag(retainKeysByTag)
     }
