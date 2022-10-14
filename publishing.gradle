@@ -1,0 +1,97 @@
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+
+tasks.register("sourceJar", Jar) {
+    archiveClassifier.set('sources')
+    if (project.plugins.findPlugin("com.android.library")) {
+        from android.sourceSets.main.java.srcDirs
+    } else {
+        from sourceSets.main.java.srcDirs
+    }
+}
+
+tasks.register("sourceJavaDoc", Jar) {
+    if (!project.plugins.findPlugin("com.android.library")) {
+        archiveClassifier.set('javadoc')
+        from javadoc.destinationDir
+    }
+}
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+project.ext["signing.keyId"] = properties.getProperty("signing.keyId")
+project.ext["signing.secretKeyRingFile"] = properties.getProperty("signing.secretKeyRingFile")
+project.ext["signing.password"] = properties.getProperty("signing.password")
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                if (project.plugins.findPlugin("com.android.library")) {
+                    from components.release
+                } else {
+                    from components.java
+                }
+
+                artifact sourceJar
+                artifact sourceJavaDoc
+
+                groupId = project.ext.groupId
+                artifactId = project.ext.artifactId
+                version = rootProject.ext.versionName
+
+                pom {
+                    name = 'Utils'
+                    description = 'May personal util library'
+                    url = 'https://github.com/Privatik/MyUtilsProject'
+
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id = 'i.kurak'
+                            name = 'Ivan Kurak'
+                            email = 'kurak.van9@gmail.com'
+                        }
+                    }
+
+                    scm {
+                        connection = 'scm:github.com/Privatik/MyUtilsProject'
+                        developerConnection = 'scm:ssh://github.com:Privatik/MyUtilsProject.git'
+                        url = 'https://github.com/Privatik/MyUtilsProject'
+                    }
+                }
+            }
+        }
+        repositories {
+            maven {
+                name = "mavencentral"
+                url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+                credentials {
+                    username properties.getProperty("ossrhUsername")
+                    password properties.getProperty("ossrhPassword")
+                }
+            }
+
+            maven {
+                name = "sonatypeSnapshots"
+                url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+                credentials {
+                    username properties.getProperty("ossrhUsername")
+                    password properties.getProperty("ossrhPassword")
+                }
+            }
+        }
+    }
+
+    signing {
+        sign publishing.publications
+    }
+}

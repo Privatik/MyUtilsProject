@@ -16,6 +16,14 @@ buildscript {
     }
 }
 
+plugins {
+    id 'maven-publish'
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+ext{
+    versionName = "1.0.0-beta"
 }

@@ -8,7 +8,7 @@ dependencyResolutionManagement {
 }
 rootProject.name = "MyUtilsProject"
 include ':app'
-include ':util:navigation-android'
+include ':util:presenter-android'
 include ':another'
 include ':util:machine'
-include ':util:navigation-common'
+include ':util:presenter-common'

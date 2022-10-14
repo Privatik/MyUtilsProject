@@ -7,7 +7,7 @@
       <module name="MyUtilsProject.util.machine" target="1.8" />
       <module name="MyUtilsProject.util.machine.main" target="1.8" />
       <module name="MyUtilsProject.util.machine.test" target="1.8" />
-      <module name="MyUtilsProject.util.navigation-android" target="11" />
+      <module name="MyUtilsProject.util.presenter-android" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>
