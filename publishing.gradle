@@ -44,7 +44,7 @@ afterEvaluate {
 
                 pom {
                     name = 'Utils'
-                    description = 'May personal util library'
+                    description = 'My personal util library'
                     url = 'https://github.com/Privatik/MyUtilsProject'
 
                     licenses {

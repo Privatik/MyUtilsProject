@@ -1,6 +1,7 @@
 package com.io.myutilsproject.screens.second
 
 import android.content.res.Configuration
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
@@ -10,6 +11,8 @@ import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import com.bumble.appyx.core.modality.BuildContext
+import com.bumble.appyx.core.node.Node
 import com.io.myutilsproject.screens.third.ThirdState
 import com.io.myutilsproject.use
 
@@ -48,6 +51,42 @@ fun SecondScreen(
         }
         Button(onClick = { incTag(stateT.count) }) {
             Text(text = "Inc by tag God")
+        }
+    }
+}
+
+class SecondNode(
+    buildContext: BuildContext,
+    private val state: Int
+): Node(buildContext) {
+
+    @Composable
+    override fun View(modifier: Modifier) {
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+//            if (currentConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
+                Text(text = "Second screen $state")
+//                Text(text = "Second screen GOD LANDSCAPE ${state.godCount} and ${stateT.count}")
+//            } else {
+//                Text(text = "Second screen PORTSCAPE ${state.count} and ${stateT.count}")
+//                Text(text = "Second screen GOD PORTSCAPE ${state.godCount} and ${stateT.count}")
+//            }
+            Button(onClick = { }) {
+                Text(text = "Open")
+            }
+            Button(onClick = {  }) {
+                Text(text = "Inc")
+            }
+            Button(onClick = {  }) {
+                Text(text = "Inc God")
+            }
+            Button(onClick = {  }) {
+                Text(text = "Inc by tag God")
+            }
         }
     }
 }
