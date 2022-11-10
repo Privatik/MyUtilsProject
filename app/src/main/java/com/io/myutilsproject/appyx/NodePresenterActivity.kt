@@ -1,13 +1,12 @@
-package com.io.navigation
+package com.io.myutilsproject.appyx
 
-import android.os.Bundle
-import android.os.PersistableBundle
-import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.bumble.appyx.core.integrationpoint.NodeActivity
+import com.io.navigation.AndroidPresenterStoreOwner
 
-abstract class PresenterComponentActivity: ComponentActivity(){
+abstract class NodePresenterActivity: NodeActivity() {
 
     @Suppress("UNCHECKED_CAST")
     private val vm: ViewModelForPresenter by viewModels{
@@ -19,6 +18,8 @@ abstract class PresenterComponentActivity: ComponentActivity(){
     }
 
     val presenterStoreOwner: AndroidPresenterStoreOwner by lazy(LazyThreadSafetyMode.NONE) { vm.owner }
+}
 
-
+private class ViewModelForPresenter: ViewModel(){
+    val owner = AndroidPresenterStoreOwner()
 }

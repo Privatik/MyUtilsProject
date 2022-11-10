@@ -25,11 +25,16 @@ open class PresenterStoreOwner<Key: Any>(
         sharedPresenterStore = sharedPresenterStore
     )
 
-    internal fun updateCurrentScreen(key: Key){
-        keyBackStack.navigateOrPop(key){ deleteKey ->
-            removeUnnecessaryPresenters(deleteKey)
-        }
+    fun push(key: Key) = keyBackStack::push
+    fun pop(key: Key? = null) {
+        keyBackStack.pop(key ?: currentKey, ::removeUnnecessaryPresenters)
     }
+
+//    fun updateCurrentScreen(key: Key){
+//        keyBackStack.navigateOrPop(key){ deleteKey ->
+//            removeUnnecessaryPresenters(deleteKey)
+//        }
+//    }
 
     private fun removeUnnecessaryPresenters(deleteKey: Key){
         simpleStores.remove(deleteKey)?.clear()

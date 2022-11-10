@@ -89,7 +89,7 @@ fun RootComposeBuilder.generateGraph() {
         val thirdPresenter: ThirdPresenter = presenter(nextScopePresenter.factory)
         val sixthPresenter: SixthPresenter = presenter(tag = "SHARED")
 
-        val adapter = presenterController<OdesseyPresenterController>()
+        val adapter = presenterController<OdesseyPresenterKeyAdapter>()
 
         TripleScreen(
             state = thirdPresenter.state.collectAsState(),

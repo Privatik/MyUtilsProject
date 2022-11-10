@@ -15,7 +15,7 @@ fun createNextScope(): NextComponent{
 
 fun RootController.setupWithActivity(
     activity: ComponentActivity,
-    adapter: com.io.navigation_common.PresenterController<String>
+    adapter: com.io.navigation_common.PresenterKeyAdapter<String>
 ) {
     setDeepLinkUri(activity.intent?.data?.path)
 

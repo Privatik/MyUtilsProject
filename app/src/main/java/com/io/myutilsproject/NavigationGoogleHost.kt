@@ -8,7 +8,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.io.myutilsproject.screens.fifth.FifthPresenter
 import com.io.myutilsproject.screens.first.FirstScreen
-import com.io.myutilsproject.screens.fouth.FourthPresenter
 import com.io.myutilsproject.screens.fouth.FourthScreen
 import com.io.myutilsproject.screens.second.SecondEffect
 import com.io.myutilsproject.screens.second.SecondPresenter
@@ -83,7 +82,7 @@ fun Navigation(
             val nextScopePresenter: SharedNextComponentPresenter = sharedPresenter()
             val thirdPresenter: ThirdPresenter = presenter(nextScopePresenter.factory)
             val sixthPresenter: SixthPresenter = presenter(tag = "SHARED")
-            val adapter = presenterController<GooglePresenterController>()
+            val adapter = presenterController<GooglePresenterKeyAdapter>()
 
             TripleScreen(
                 state = thirdPresenter.state.collectAsState(),
