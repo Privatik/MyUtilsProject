@@ -23,7 +23,13 @@ abstract class AndroidPresenter: UIPresenter {
     }
 
     open override fun clear() {
-        TODO("Not yet implemented")
+
     }
+
+    protected fun finalize() {
+        clear()
+    }
+
+
 
 }

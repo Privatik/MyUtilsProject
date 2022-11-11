@@ -1,23 +1,18 @@
 package com.io.navigation_common
 
-import java.util.*
-import kotlin.collections.HashMap
-import kotlin.collections.HashSet
+import java.lang.ref.WeakReference
+import java.util.WeakHashMap
 
 open class PresenterStoreOwner<Key: Any>(
     private val keyBackStack: PresenterBackStack<Key> = KeyBackStack(),
+    private val keyAdapter: PresenterKeyAdapter<Key>
 ){
+
     private val sharedPresenterStore = SharedPresenterStore<Key>()
     private val simpleStores = HashMap<Key, SimplePresenterStore>()
 
     private val keyTag = HashMap<String, Key>()
     private val tagsStores = HashMap<Key, TagPresenterStore>()
-
-    private val backStack: Stack<Key>
-        get() = keyBackStack.backStack
-
-    private val currentKey: Key
-        get() = backStack.peek()
 
     protected val restorePresenterStoreOwner: RestorePresenterStoreOwner<Key> = DefaultRestorePresenterStoreOwner(
         presenterBackStack = keyBackStack,
@@ -25,21 +20,18 @@ open class PresenterStoreOwner<Key: Any>(
         sharedPresenterStore = sharedPresenterStore
     )
 
-    fun push(key: Key) = keyBackStack::push
-    fun pop(key: Key? = null) {
-        keyBackStack.pop(key ?: currentKey, ::removeUnnecessaryPresenters)
+    private fun removeUnnecessaryPresenters(){
+        keyStore
+            .map { wKey -> wKey.get() }
+            .forEach { key ->
+                removeUnnecessaryPresenters(key)
+            }
     }
 
-//    fun updateCurrentScreen(key: Key){
-//        keyBackStack.navigateOrPop(key){ deleteKey ->
-//            removeUnnecessaryPresenters(deleteKey)
-//        }
-//    }
-
-    private fun removeUnnecessaryPresenters(deleteKey: Key){
-        simpleStores.remove(deleteKey)?.clear()
-        sharedPresenterStore.clearByKey(deleteKey)
-        tagsStores.remove(deleteKey)?.apply {
+    private fun removeUnnecessaryPresenters(key: Key){
+        simpleStores.remove(key)?.clear()
+        sharedPresenterStore.clearByKey(key)
+        tagsStores.remove(key)?.apply {
             keyTag.remove(tag)
             clear()
         }
@@ -51,20 +43,22 @@ open class PresenterStoreOwner<Key: Any>(
         factory: PresenterFactory,
         isShared: Boolean = false
     ): P {
+        val currentKey = getCurrentKey()
+
         if (tag != null){
-            val tagStore = createOrGetTag(tag)
+            val tagStore = createOrGetTag(tag, currentKey)
             return tagStore.createOrGet(clazz, factory)
         }
 
         return if (isShared){
             sharedPresenterStore.createOrGetSharedPresenter<P>(currentKey, clazz, factory)
         } else {
-            val store = createOrGetPresenterStore()
+            val store = createOrGetPresenterStore(currentKey)
             store.createOrGetPresenter<P>(clazz, factory)
         }
     }
 
-    private fun createOrGetTag(tag: String): TagPresenterStore{
+    private fun createOrGetTag(tag: String, currentKey: Key): TagPresenterStore{
         tagsStores[keyTag[tag]]?.let {
             return it
         }
@@ -75,7 +69,7 @@ open class PresenterStoreOwner<Key: Any>(
         return tagStore
     }
 
-    private fun createOrGetPresenterStore(): SimplePresenterStore {
+    private fun createOrGetPresenterStore(currentKey: Key): SimplePresenterStore {
         simpleStores[currentKey]?.let {
             return it
         }
@@ -83,6 +77,10 @@ open class PresenterStoreOwner<Key: Any>(
         simpleStores[currentKey] = store
 
         return store
+    }
+
+    private fun getCurrentKey(): Key{
+        return keyAdapter.getKey()
     }
 
 }
