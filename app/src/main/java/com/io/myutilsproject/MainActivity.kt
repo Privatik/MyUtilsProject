@@ -1,53 +1,43 @@
 package com.io.myutilsproject
 
 import android.os.Bundle
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
-import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.compose.rememberNavController
-import com.bumble.appyx.core.integration.NodeHost
 import com.bumble.appyx.core.integrationpoint.NodeActivity
-import com.io.myutilsproject.appyx.NodePresenterActivity
-import com.io.myutilsproject.screens.first.FirstNode
-import com.io.navigation.PresenterComponentActivity
+import com.io.navigation.DefaultPresenterComponent
+import com.io.navigation.PresenterComponent
 import com.io.navigation.PresenterCompositionLocalProvider
-import com.io.navigation.setContentWithPresenter
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.onEach
-import ru.alexgladkov.odyssey.compose.base.Navigator
-import ru.alexgladkov.odyssey.compose.local.LocalRootController
+import com.io.navigation_common.PresenterStoreOwner
 import ru.alexgladkov.odyssey.compose.navigation.RootComposeBuilder
-import ru.alexgladkov.odyssey.compose.navigation.modal_navigation.ModalNavigator
-import ru.alexgladkov.odyssey.core.backpress.OnBackPressedDispatcher
-import java.util.*
 
-class MainActivity: NodePresenterActivity() {
+class MainActivity: NodeActivity(),
+    PresenterComponent<NavBackStackEntry, String> by DefaultPresenterComponent() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
 //        setOdessey()
-//        setGoogle()
-        setAppyx()
+        setGoogle()
+//        setAppyx()
     }
 
     private fun setAppyx() {
-        onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-
-            }
-        })
-
-        setContent {
-            PresenterCompositionLocalProvider<String>(){
-                NodeHost(integrationPoint = appyxIntegrationPoint) {
-                    AppyxHost(it, lifecycleScope)
-                }
-            }
-        }
+//        onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
+//            override fun handleOnBackPressed() {
+//
+//            }
+//        })
+//
+//        setContent {
+//            PresenterCompositionLocalProvider<String>(){
+//                NodeHost(integrationPoint = appyxIntegrationPoint) {
+//                    AppyxHost(it, lifecycleScope)
+//                }
+//            }
+//        }
     }
 
     fun setOdessey(){
@@ -95,8 +85,10 @@ class MainActivity: NodePresenterActivity() {
 
         setContent {
             val navController = rememberNavController()
-            val controller = GooglePresenterController(navController, presenterStoreOwner)
-
+            remember {
+                GooglePresenterKeyAdapter(navController)
+                    .also { adapter -> createPresenterOwner(this, getOwner(adapter)) }
+            }
             BackHandler(
                 onBack = {
                     if (navController.backQueue.size <= 2){
@@ -108,13 +100,16 @@ class MainActivity: NodePresenterActivity() {
             )
 
             PresenterCompositionLocalProvider(
-                controller = controller,
-                owner = presenterStoreOwner
+                owner = retainPresenterStoreOwner
             ) {
                 Navigation(
                     navController = navController
                 )
             }
         }
+    }
+
+    private fun getOwner(adapter: GooglePresenterKeyAdapter): PresenterStoreOwner<NavBackStackEntry, String>{
+        return GooglePresenterOwner(adapter)
     }
 }

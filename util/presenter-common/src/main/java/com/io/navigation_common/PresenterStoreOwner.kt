@@ -1,86 +1,75 @@
 package com.io.navigation_common
 
-import java.lang.ref.WeakReference
+import java.util.UUID
 import java.util.WeakHashMap
 
-open class PresenterStoreOwner<Key: Any>(
-    private val keyBackStack: PresenterBackStack<Key> = KeyBackStack(),
-    private val keyAdapter: PresenterKeyAdapter<Key>
+abstract class PresenterStoreOwner<Guide: Any, CacheKey: Any>(
+    private val keyAdapter: PresenterKeyAdapter<Guide>
 ){
+    private val cacheKeyStore = hashSetOf<CacheKey>()
+    private val keyStores = WeakHashMap<Guide, CacheKey>()
 
-    private val sharedPresenterStore = SharedPresenterStore<Key>()
-    private val simpleStores = HashMap<Key, SimplePresenterStore>()
+    private val sharedPresenterStore = SharedPresenterStore<CacheKey>()
+    private val tagPresenterStore = TagPresenterStore<CacheKey>()
+    private val simpleStores = HashMap<CacheKey, SimplePresenterStore>()
 
-    private val keyTag = HashMap<String, Key>()
-    private val tagsStores = HashMap<Key, TagPresenterStore>()
-
-    protected val restorePresenterStoreOwner: RestorePresenterStoreOwner<Key> = DefaultRestorePresenterStoreOwner(
-        presenterBackStack = keyBackStack,
-        keyTag = keyTag,
-        sharedPresenterStore = sharedPresenterStore
+    protected val restorePresenterStoreOwner: RestorePresenterStoreOwner<CacheKey> = DefaultRestorePresenterStoreOwner(
+        tagPresenterStore = tagPresenterStore,
+        sharedPresenterStore = sharedPresenterStore,
     )
 
     private fun removeUnnecessaryPresenters(){
-        keyStore
-            .map { wKey -> wKey.get() }
-            .forEach { key ->
-                removeUnnecessaryPresenters(key)
-            }
+        val setAliveCacheKeys = keyStores.values.toSet()
+        cacheKeyStore
+            .filter { cacheKey -> !setAliveCacheKeys.contains(cacheKey) }
+            .onEach (::removeUnnecessaryPresentersByKey)
+            .forEach(cacheKeyStore::remove)
     }
 
-    private fun removeUnnecessaryPresenters(key: Key){
-        simpleStores.remove(key)?.clear()
-        sharedPresenterStore.clearByKey(key)
-        tagsStores.remove(key)?.apply {
-            keyTag.remove(tag)
-            clear()
-        }
+    private fun removeUnnecessaryPresentersByKey(cacheKey: CacheKey){
+        simpleStores.remove(cacheKey)?.clear()
+        sharedPresenterStore.clearByCacheKey(cacheKey)
+        tagPresenterStore.clearByCacheKey(cacheKey)
     }
 
+    @Synchronized
     fun <P: UIPresenter> createPresenter(
         tag: String? = null,
         clazz: Class<out UIPresenter>,
         factory: PresenterFactory,
         isShared: Boolean = false
     ): P {
-        val currentKey = getCurrentKey()
+        removeUnnecessaryPresenters()
+        val currentGuide = getCurrentGuide()
+        val keyForCache = keyStores.getOrDefault(currentGuide, getNewKeyForCache())
 
         if (tag != null){
-            val tagStore = createOrGetTag(tag, currentKey)
-            return tagStore.createOrGet(clazz, factory)
+            return tagPresenterStore.createOrGet(tag, keyForCache, clazz, factory)
         }
 
         return if (isShared){
-            sharedPresenterStore.createOrGetSharedPresenter<P>(currentKey, clazz, factory)
+            sharedPresenterStore.createOrGetSharedPresenter<P>(keyForCache, clazz, factory)
         } else {
-            val store = createOrGetPresenterStore(currentKey)
+            val store = createOrGetPresenterStore(keyForCache)
             store.createOrGetPresenter<P>(clazz, factory)
         }
     }
 
-    private fun createOrGetTag(tag: String, currentKey: Key): TagPresenterStore{
-        tagsStores[keyTag[tag]]?.let {
-            return it
-        }
-        val tagStore = TagPresenterStore(tag)
-        tagsStores[currentKey] = tagStore
-        keyTag[tag] = currentKey
 
-        return tagStore
-    }
-
-    private fun createOrGetPresenterStore(currentKey: Key): SimplePresenterStore {
-        simpleStores[currentKey]?.let {
+    private fun createOrGetPresenterStore(cacheKey: CacheKey): SimplePresenterStore {
+        simpleStores[cacheKey]?.let {
             return it
         }
         val store = SimplePresenterStore()
-        simpleStores[currentKey] = store
+        simpleStores[cacheKey] = store
 
         return store
     }
 
-    private fun getCurrentKey(): Key{
+    private fun getCurrentGuide(): Guide{
         return keyAdapter.getKey()
     }
+
+    abstract fun getNewKeyForCache(): CacheKey
 
 }

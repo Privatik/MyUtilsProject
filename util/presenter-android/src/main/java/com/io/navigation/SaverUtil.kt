@@ -5,13 +5,15 @@ import com.io.navigation_common.PresenterFactory
 import com.io.navigation_common.PresenterStoreOwner
 import com.io.navigation_common.UIPresenter
 
-internal fun presenterOwnerSaver(owner: AndroidPresenterStoreOwner): Saver<AndroidPresenterStoreOwner, *> =
+internal fun <Guide: Any, CacheKey: Any> presenterOwnerSaver(
+    owner: AndroidPresenterStoreOwner<Guide, CacheKey>
+): Saver<AndroidPresenterStoreOwner<Guide, CacheKey>, *> =
     Saver(
         save = { it.saveState() },
         restore = { owner.apply { restoreState(it) } }
     )
 
-internal fun <P : UIPresenter> PresenterStoreOwner<out Any>.androidPresenterSaver(
+internal fun <P: UIPresenter, Guide: Any, CacheKey: Any> PresenterStoreOwner<Guide, CacheKey>.androidPresenterSaver(
     tag: String? = null,
     factory: PresenterFactory,
     clazz: Class<out UIPresenter>,

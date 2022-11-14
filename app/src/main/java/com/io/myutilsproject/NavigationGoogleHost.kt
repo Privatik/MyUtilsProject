@@ -2,7 +2,10 @@ package com.io.myutilsproject
 
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHostState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -15,8 +18,6 @@ import com.io.myutilsproject.screens.second.SecondScreen
 import com.io.myutilsproject.screens.sixth.SixthPresenter
 import com.io.myutilsproject.screens.third.ThirdPresenter
 import com.io.myutilsproject.screens.third.TripleScreen
-
-import com.io.navigation.presenterController
 import com.io.navigation.presenter
 import com.io.navigation.sharedPresenter
 import kotlinx.coroutines.flow.launchIn
@@ -82,7 +83,6 @@ fun Navigation(
             val nextScopePresenter: SharedNextComponentPresenter = sharedPresenter()
             val thirdPresenter: ThirdPresenter = presenter(nextScopePresenter.factory)
             val sixthPresenter: SixthPresenter = presenter(tag = "SHARED")
-            val adapter = presenterController<GooglePresenterKeyAdapter>()
 
             TripleScreen(
                 state = thirdPresenter.state.collectAsState(),
