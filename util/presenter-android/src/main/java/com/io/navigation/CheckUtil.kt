@@ -6,7 +6,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
 @OptIn(ExperimentalContracts::class)
-fun <Guide: Any, Key: Any> checkOwnerAsAndroidPresenterOwner(owner: PresenterStoreOwner<Guide,Key>){
+fun <Guide: Any> checkOwnerAsAndroidPresenterOwner(owner: PresenterStoreOwner<Guide>){
     contract {
         returns() implies (owner is AndroidPresenterStoreOwner)
     }

@@ -24,139 +24,137 @@ import ru.alexgladkov.odyssey.compose.extensions.*
 import ru.alexgladkov.odyssey.compose.local.LocalRootController
 import ru.alexgladkov.odyssey.compose.navigation.RootComposeBuilder
 
-
-fun RootComposeBuilder.generateGraph() {
-
-    screen(
-        name = Screens.FirstScreen.route,
-    ) {
-        val controller = LocalRootController.current
-        val appScopePresenter: SharedAppComponentPresenter = sharedPresenter()
-        val firstPresenter: FirstPresenter = presenter(appScopePresenter.factory)
-        FirstScreen{
-            controller.push(Screens.SecondScreen.route)
-        }
-    }
-
-    screen(
-        name = Screens.SecondScreen.route,
-    ){
-        val controller = LocalRootController.current
-        val appScopePresenter: SharedAppComponentPresenter = sharedPresenter()
-        val secondPresenter: SecondPresenter = presenter(appScopePresenter.factory)
-        val fifthPresenter: FifthPresenter = presenter(tag = "SHARED")
-        val snackbarHostState = remember {
-            SnackbarHostState()
-        }
-
-        LaunchedEffect(Unit) {
-            secondPresenter
-                .singleEffect
-                .onEach {
-                    when (it) {
-                        is SecondEffect.Snack -> {
-                            snackbarHostState.showSnackbar(
-                                message = it.message,
-                                duration = SnackbarDuration.Long
-                            )
-                        }
-                    }
-                }
-                .launchIn(this)
-        }
-
-        SecondScreen(
-            body = secondPresenter.state.collectAsState(),
-            bodyT = fifthPresenter.state.collectAsState(),
-            inc = { secondPresenter.inc(it) },
-            incGod = { secondPresenter.incGod(it) },
-            open = {
-                controller.push(
-                    screen = Screens.ThirdScreen.route
-                )
-            },
-            incTag = {
-                fifthPresenter.inc(it)
-            }
-        )
-    }
-
-    screen(
-        name = Screens.ThirdScreen.route,
-    ){
-        val controller = LocalRootController.current
-        val nextScopePresenter: SharedNextComponentPresenter = sharedPresenter()
-        val thirdPresenter: ThirdPresenter = presenter(nextScopePresenter.factory)
-        val sixthPresenter: SixthPresenter = presenter(tag = "SHARED")
-
-        val adapter = presenterController<OdesseyPresenterKeyAdapter>()
-
-        TripleScreen(
-            state = thirdPresenter.state.collectAsState(),
-            stateT = sixthPresenter.state.collectAsState(),
-            inc = { thirdPresenter.inc(it) },
-            backToFirst = {
-                controller.backToScreen(Screens.FirstScreen.route)
-            },
-            next = {
-
-            },
-            incT = {
-                sixthPresenter.inc(it)
-            }
-        )
-    }
-
-    flow(name = Screens.FourScreen.route) {
-        screen(name = Screens.FifthScreen.route) {
-
-                val controller = LocalRootController.current
-            val nextScopePresenter: SharedNextComponentPresenter = sharedPresenter()
-                val thirdPresenter: ThirdPresenter = sharedPresenter(nextScopePresenter.factory)
-                val state = thirdPresenter.state.collectAsState()
-
-                FifthScreen(
-                    state = state.value,
-                    inc = { thirdPresenter.inc(state.value.count) },
-                    open = {
-                        controller.push(
-                            screen = Screens.SixthScreen.route
-                        )
-                    }
-                )
-
-        }
-
-        screen(name = Screens.SixthScreen.route) {
-
-                val controller = LocalRootController.current
-            val nextScopePresenter: SharedNextComponentPresenter = sharedPresenter()
-                val thirdPresenter: ThirdPresenter = sharedPresenter(nextScopePresenter.factory)
-                val state = thirdPresenter.state.collectAsState()
-
-                SixthScreen(
-                    state = state.value,
-                    inc = { thirdPresenter.inc(state.value.count) },
-                    open = {
-                        controller.push(
-                            screen = Screens.SeventhScreen.route
-                        )
-                    }
-                )
-
-        }
-
-        screen(name = Screens.SeventhScreen.route) {
-            val nextScopePresenter: SharedNextComponentPresenter = sharedPresenter()
-                val thirdPresenter: ThirdPresenter = presenter(nextScopePresenter.factory)
-                val state = thirdPresenter.state.collectAsState()
-
-                SeventhScreen(
-                    state = state.value,
-                    inc = { thirdPresenter.inc(state.value.count) },
-                )
-            }
-    }
+//
+//fun RootComposeBuilder.generateGraph() {
+//
+//    screen(
+//        name = Screens.FirstScreen.route,
+//    ) {
+//        val controller = LocalRootController.current
+//        val appScopePresenter: SharedAppComponentPresenter = sharedPresenter()
+//        val firstPresenter: FirstPresenter = presenter(appScopePresenter.factory)
+//        FirstScreen{
+//            controller.push(Screens.SecondScreen.route)
+//        }
+//    }
+//
+//    screen(
+//        name = Screens.SecondScreen.route,
+//    ){
+//        val controller = LocalRootController.current
+//        val appScopePresenter: SharedAppComponentPresenter = sharedPresenter()
+//        val secondPresenter: SecondPresenter = presenter(appScopePresenter.factory)
+//        val fifthPresenter: FifthPresenter = sharedPresenter()
+//        val snackbarHostState = remember {
+//            SnackbarHostState()
+//        }
+//
+//        LaunchedEffect(Unit) {
+//            secondPresenter
+//                .singleEffect
+//                .onEach {
+//                    when (it) {
+//                        is SecondEffect.Snack -> {
+//                            snackbarHostState.showSnackbar(
+//                                message = it.message,
+//                                duration = SnackbarDuration.Long
+//                            )
+//                        }
+//                    }
+//                }
+//                .launchIn(this)
+//        }
+//
+//        SecondScreen(
+//            body = secondPresenter.state.collectAsState(),
+//            bodyT = fifthPresenter.state.collectAsState(),
+//            inc = { secondPresenter.inc(it) },
+//            incGod = { secondPresenter.incGod(it) },
+//            open = {
+//                controller.push(
+//                    screen = Screens.ThirdScreen.route
+//                )
+//            },
+//            incTag = {
+//                fifthPresenter.inc(it)
+//            }
+//        )
+//    }
+//
+//    screen(
+//        name = Screens.ThirdScreen.route,
+//    ){
+//        val controller = LocalRootController.current
+//        val nextScopePresenter: SharedNextComponentPresenter = sharedPresenter()
+//        val thirdPresenter: ThirdPresenter = presenter(nextScopePresenter.factory)
+//        val sixthPresenter: SixthPresenter = sharedPresenter()
+//
+//        TripleScreen(
+//            state = thirdPresenter.state.collectAsState(),
+//            stateT = sixthPresenter.state.collectAsState(),
+//            inc = { thirdPresenter.inc(it) },
+//            backToFirst = {
+//                controller.backToScreen(Screens.FirstScreen.route)
+//            },
+//            next = {
+//
+//            },
+//            incT = {
+//                sixthPresenter.inc(it)
+//            }
+//        )
+//    }
+//
+//    flow(name = Screens.FourScreen.route) {
+//        screen(name = Screens.FifthScreen.route) {
+//
+//                val controller = LocalRootController.current
+//            val nextScopePresenter: SharedNextComponentPresenter = sharedPresenter()
+//                val thirdPresenter: ThirdPresenter = sharedPresenter(nextScopePresenter.factory)
+//                val state = thirdPresenter.state.collectAsState()
+//
+//                FifthScreen(
+//                    state = state.value,
+//                    inc = { thirdPresenter.inc(state.value.count) },
+//                    open = {
+//                        controller.push(
+//                            screen = Screens.SixthScreen.route
+//                        )
+//                    }
+//                )
+//
+//        }
+//
+//        screen(name = Screens.SixthScreen.route) {
+//
+//                val controller = LocalRootController.current
+//            val nextScopePresenter: SharedNextComponentPresenter = sharedPresenter()
+//                val thirdPresenter: ThirdPresenter = sharedPresenter(nextScopePresenter.factory)
+//                val state = thirdPresenter.state.collectAsState()
+//
+//                SixthScreen(
+//                    state = state.value,
+//                    inc = { thirdPresenter.inc(state.value.count) },
+//                    open = {
+//                        controller.push(
+//                            screen = Screens.SeventhScreen.route
+//                        )
+//                    }
+//                )
+//
+//        }
+//
+//        screen(name = Screens.SeventhScreen.route) {
+//            val nextScopePresenter: SharedNextComponentPresenter = sharedPresenter()
+//                val thirdPresenter: ThirdPresenter = presenter(nextScopePresenter.factory)
+//                val state = thirdPresenter.state.collectAsState()
+//
+//                SeventhScreen(
+//                    state = state.value,
+//                    inc = { thirdPresenter.inc(state.value.count) },
+//                )
+//            }
+//    }
 
 //    bottomNavigation(name = Screens.FourScreen.route, tabsNavModel = BottomConfiguration()) {
 //        tab(FifthTab()) {
@@ -206,4 +204,4 @@ fun RootComposeBuilder.generateGraph() {
 //
 //        }
 //    }
-}
+//}

@@ -71,20 +71,15 @@ import java.util.*
 
 class GooglePresenterKeyAdapter(
     private val controller: NavHostController
-): PresenterKeyAdapter<NavBackStackEntry> {
+): PresenterKeyAdapter<NavBackStackEntry>() {
     override fun getKey(): NavBackStackEntry = controller.currentBackStackEntry!!
+
+    override fun getCacheKey(): String {
+        return getKey().id
+    }
 
 }
 
 class GooglePresenterOwner(
     keyAdapter: GooglePresenterKeyAdapter
-): AndroidPresenterStoreOwner<NavBackStackEntry, String>(keyAdapter){
-    override fun saveState(): Bundle? = null
-
-    override fun restoreState(bundle: Bundle) {}
-
-    override fun getNewKeyForCache(): String {
-        return UUID.randomUUID().toString()
-    }
-
-}
+): AndroidPresenterStoreOwner<NavBackStackEntry>(keyAdapter)

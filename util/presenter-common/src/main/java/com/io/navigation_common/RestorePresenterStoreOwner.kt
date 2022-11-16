@@ -1,27 +1,18 @@
 package com.io.navigation_common
 
-interface RestorePresenterStoreOwner<Key: Any>{
-    fun saveSharedPresenters(): List<Pair<Key, Set<String>>>
-    fun restoreSharedPresenters(retain: List<Pair<Key, Set<String>>>)
-
-    fun saveTagPresenters(): List<Pair<Key, String>>
-    fun restoreTagPresenters(retain: List<Pair<Key, String>>)
+interface RestorePresenterStoreOwner<CacheKey: Any>{
+    fun saveSharedPresenters(): Map<String, CacheKey>
+    fun restoreSharedPresenters(retain: Map<String, CacheKey>)
 }
 
-internal class DefaultRestorePresenterStoreOwner<Key: Any>(
-    private val tagPresenterStore: TagPresenterStore<Key>,
-    private val sharedPresenterStore: SharedPresenterStore<Key>
-): RestorePresenterStoreOwner<Key>{
+internal class DefaultRestorePresenterStoreOwner<CacheKey: Any>(
+    private val sharedPresenterStore: SharedPresenterStore<CacheKey>
+): RestorePresenterStoreOwner<CacheKey>{
 
-    override fun saveSharedPresenters(): List<Pair<Key, Set<String>>> =
+    override fun saveSharedPresenters(): Map<String, CacheKey> =
         sharedPresenterStore.save()
-    override fun restoreSharedPresenters(retain: List<Pair<Key, Set<String>>>) =
+    override fun restoreSharedPresenters(retain: Map<String, CacheKey>) =
         sharedPresenterStore.restore(retain)
-
-    override fun saveTagPresenters(): List<Pair<Key, String>> =
-        tagPresenterStore.save()
-    override fun restoreTagPresenters(retain: List<Pair<Key, String>>) =
-        tagPresenterStore.restore(retain)
 
 }
 

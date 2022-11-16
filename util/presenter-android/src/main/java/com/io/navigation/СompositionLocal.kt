@@ -5,7 +5,7 @@ import androidx.compose.runtime.compositionLocalOf
 import com.io.navigation_common.PresenterKeyAdapter
 import com.io.navigation_common.PresenterStoreOwner
 
-internal val LocalPresenterOwnerController = compositionLocalOf<PresenterStoreOwner<out Any,out Any>> {
+internal val LocalPresenterOwnerController = compositionLocalOf<PresenterStoreOwner<out Any>> {
     error("No PresenterStoreOwner provider")
 }
 

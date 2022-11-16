@@ -3,18 +3,16 @@ package com.io.navigation_common
 import java.util.UUID
 import java.util.WeakHashMap
 
-abstract class PresenterStoreOwner<Guide: Any, CacheKey: Any>(
+open class PresenterStoreOwner<Guide: Any>(
     private val keyAdapter: PresenterKeyAdapter<Guide>
 ){
-    private val cacheKeyStore = hashSetOf<CacheKey>()
-    private val keyStores = WeakHashMap<Guide, CacheKey>()
+    private val cacheKeyStore = hashSetOf<String>()
+    private val keyStores = WeakHashMap<Guide, String>()
 
-    private val sharedPresenterStore = SharedPresenterStore<CacheKey>()
-    private val tagPresenterStore = TagPresenterStore<CacheKey>()
-    private val simpleStores = HashMap<CacheKey, SimplePresenterStore>()
+    private val sharedPresenterStore = SharedPresenterStore<String>()
+    private val simpleStores = HashMap<String, SimplePresenterStore>()
 
-    protected val restorePresenterStoreOwner: RestorePresenterStoreOwner<CacheKey> = DefaultRestorePresenterStoreOwner(
-        tagPresenterStore = tagPresenterStore,
+    protected val restorePresenterStoreOwner: RestorePresenterStoreOwner<String> = DefaultRestorePresenterStoreOwner(
         sharedPresenterStore = sharedPresenterStore,
     )
 
@@ -26,26 +24,19 @@ abstract class PresenterStoreOwner<Guide: Any, CacheKey: Any>(
             .forEach(cacheKeyStore::remove)
     }
 
-    private fun removeUnnecessaryPresentersByKey(cacheKey: CacheKey){
+    private fun removeUnnecessaryPresentersByKey(cacheKey: String){
         simpleStores.remove(cacheKey)?.clear()
         sharedPresenterStore.clearByCacheKey(cacheKey)
-        tagPresenterStore.clearByCacheKey(cacheKey)
     }
 
     @Synchronized
     fun <P: UIPresenter> createPresenter(
-        tag: String? = null,
         clazz: Class<out UIPresenter>,
         factory: PresenterFactory,
         isShared: Boolean = false
     ): P {
         removeUnnecessaryPresenters()
-        val currentGuide = getCurrentGuide()
-        val keyForCache = keyStores.getOrDefault(currentGuide, getNewKeyForCache())
-
-        if (tag != null){
-            return tagPresenterStore.createOrGet(tag, keyForCache, clazz, factory)
-        }
+        val keyForCache = addAndGetCacheKey()
 
         return if (isShared){
             sharedPresenterStore.createOrGetSharedPresenter<P>(keyForCache, clazz, factory)
@@ -56,7 +47,7 @@ abstract class PresenterStoreOwner<Guide: Any, CacheKey: Any>(
     }
 
 
-    private fun createOrGetPresenterStore(cacheKey: CacheKey): SimplePresenterStore {
+    private fun createOrGetPresenterStore(cacheKey: String): SimplePresenterStore {
         simpleStores[cacheKey]?.let {
             return it
         }
@@ -70,6 +61,21 @@ abstract class PresenterStoreOwner<Guide: Any, CacheKey: Any>(
         return keyAdapter.getKey()
     }
 
-    abstract fun getNewKeyForCache(): CacheKey
+    private fun addAndGetCacheKey(): String{
+        val currentGuide = getCurrentGuide()
+        val keyForCache = keyStores.getOrElse(currentGuide){
+            val newCacheKey = getNewKeyForCache()
+            keyStores[currentGuide] = newCacheKey
+            cacheKeyStore.add(newCacheKey)
+            newCacheKey
+        }
+
+        return keyForCache
+    }
+
+
+    protected open fun getNewKeyForCache(): String{
+        return keyAdapter.getCacheKey()
+    }
 
 }

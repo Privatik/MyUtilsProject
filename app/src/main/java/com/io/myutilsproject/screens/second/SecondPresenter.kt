@@ -48,11 +48,7 @@ class SecondPresenter @Inject constructor(
             },
             effect = { _, _, payload ->
                 println("Machine $payload")
-                if (payload % 10 == 0 && payload != 0){
-                    SecondEffect.Snack("Ten")
-                } else {
-                    null
-                }
+                SecondEffect.Snack(payload.toString())
             }
         )
 

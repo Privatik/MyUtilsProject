@@ -15,6 +15,7 @@ import com.io.myutilsproject.screens.seventh.SeventhScreen
 import com.io.myutilsproject.screens.sixth.SixthScreen
 import com.io.myutilsproject.screens.third.ThirdState
 import com.io.navigation.presenter
+import com.io.navigation.sharedPresenter
 
 private val navigationList = listOf<Pair<String, Screens>>(
     "five" to Screens.SeventhScreen,
@@ -34,19 +35,18 @@ fun FourthScreen() {
             .fillMaxWidth()
             .fillMaxHeight(9f)
     ) {
+        val Spresenter: SeventhPresenter by presenter()
+        val EighthPresenter: EighthPresenter by presenter()
+
         when (currentScreen){
             Screens.SeventhScreen -> {
-                val presenter: SeventhPresenter by presenter(tag = tag)
-
-                SeventhScreen(presenter.state.collectAsState().value){
+                SeventhScreen(Spresenter.state.collectAsState().value){
 
                 }
             }
             Screens.SixthScreen -> {
-                val presenter: EighthPresenter by presenter(tag = tag)
-
                 SixthScreen(
-                    state = presenter.state.collectAsState().value,
+                    state = EighthPresenter.state.collectAsState().value,
                     inc = {
 
                     },

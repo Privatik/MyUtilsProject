@@ -2,10 +2,7 @@ package com.io.myutilsproject
 
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHostState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -15,8 +12,10 @@ import com.io.myutilsproject.screens.fouth.FourthScreen
 import com.io.myutilsproject.screens.second.SecondEffect
 import com.io.myutilsproject.screens.second.SecondPresenter
 import com.io.myutilsproject.screens.second.SecondScreen
+import com.io.myutilsproject.screens.second.SecondState
 import com.io.myutilsproject.screens.sixth.SixthPresenter
 import com.io.myutilsproject.screens.third.ThirdPresenter
+import com.io.myutilsproject.screens.third.ThirdState
 import com.io.myutilsproject.screens.third.TripleScreen
 import com.io.navigation.presenter
 import com.io.navigation.sharedPresenter
@@ -33,7 +32,7 @@ fun Navigation(
 
         composable(Screens.FirstScreen.route){
             println("Presenter create first screen")
-            val appScopePresenter: SharedAppComponentPresenter = sharedPresenter()
+//            val appScopePresenter: SharedAppComponentPresenter = sharedPresenter()
             FirstScreen{
                 navController.navigate(Screens.SecondScreen.route)
             }
@@ -41,53 +40,62 @@ fun Navigation(
 
         composable(Screens.SecondScreen.route){
             println("Presenter create second screen")
-            val appScopePresenter: SharedAppComponentPresenter = sharedPresenter()
-            val secondPresenter: SecondPresenter = presenter(appScopePresenter.factory)
-            val fifthPresenter: FifthPresenter = presenter(tag = "SHARED")
-            val snackbarHostState = remember {
-                SnackbarHostState()
-            }
+//            val appScopePresenter: SharedAppComponentPresenter = sharedPresenter()
+//            val secondPresenter: SecondPresenter = presenter(appScopePresenter.factory)
+//            val fifthPresenter: FifthPresenter = sharedPresenter()
+//            val snackbarHostState = remember {
+//                SnackbarHostState()
+//            }
+//
+//            LaunchedEffect(Unit){
+//                secondPresenter
+//                    .singleEffect
+//                    .onEach {
+//                        when (it){
+//                            is SecondEffect.Snack -> {
+//                                println("Machine show toast with ${it.message}")
+//                            }
+//                        }
+//                    }
+//                    .launchIn(this)
+//            }
 
-            LaunchedEffect(Unit){
-                secondPresenter
-                    .singleEffect
-                    .onEach {
-                        when (it){
-                            is SecondEffect.Snack -> {
-                                snackbarHostState.showSnackbar(
-                                    message = it.message,
-                                    duration = SnackbarDuration.Long
-                                )
-                            }
-                        }
-                    }
-                    .launchIn(this)
+            val secondState = remember {
+                mutableStateOf(SecondState(godCount = 0))
             }
-
+            val fifthState = remember {
+                mutableStateOf(ThirdState())
+            }
             SecondScreen(
-                body = secondPresenter.state.collectAsState(),
-                bodyT = fifthPresenter.state.collectAsState(),
-                inc = { secondPresenter.inc(it) },
-                incGod = { secondPresenter.incGod(it) },
+                body =  secondState,
+                bodyT = fifthState,
+                inc = {  },
+                incGod = { },
                 open = {
                     navController.navigate(Screens.ThirdScreen.route)
                 },
                 incTag = {
-                    fifthPresenter.inc(it)
+
                 }
             )
 
         }
 
         composable(Screens.ThirdScreen.route){
-            val nextScopePresenter: SharedNextComponentPresenter = sharedPresenter()
-            val thirdPresenter: ThirdPresenter = presenter(nextScopePresenter.factory)
-            val sixthPresenter: SixthPresenter = presenter(tag = "SHARED")
+//            val nextScopePresenter: SharedNextComponentPresenter = sharedPresenter()
+//            val thirdPresenter: ThirdPresenter = presenter(nextScopePresenter.factory)
+//            val sixthPresenter: SixthPresenter = sharedPresenter()
 
+            val sixthState = remember {
+                mutableStateOf(ThirdState())
+            }
+            val thirdState = remember {
+                mutableStateOf(ThirdState())
+            }
             TripleScreen(
-                state = thirdPresenter.state.collectAsState(),
-                stateT = sixthPresenter.state.collectAsState(),
-                inc = { thirdPresenter.inc(it) },
+                state = thirdState,
+                stateT = sixthState,
+                inc = {  },
                 backToFirst = {
                     navController.popBackStack(Screens.FirstScreen.route, false)
                 },
@@ -95,7 +103,7 @@ fun Navigation(
 
                 },
                 incT = {
-                    sixthPresenter.inc(it)
+
                 }
             )
 

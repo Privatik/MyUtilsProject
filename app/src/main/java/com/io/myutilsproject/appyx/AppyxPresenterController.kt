@@ -5,11 +5,11 @@ import com.bumble.appyx.navmodel.backstack.BackStack
 import com.io.myutilsproject.SimpleNode
 import kotlinx.coroutines.flow.*
 
-class AppyxPresenterKeyAdapter(
-    owner: AppyxAndroidPresenterStoreOwner,
-    private val backStack: BackStack<SimpleNode>
-){
-    private val ids = HashSet<NavKey<SimpleNode>>()
+//class AppyxPresenterKeyAdapter(
+//    owner: AppyxAndroidPresenterStoreOwner,
+//    private val backStack: BackStack<SimpleNode>
+//){
+//    private val ids = HashSet<NavKey<SimpleNode>>()
 
 //    val backState = backStack
 //        .elements
@@ -36,4 +36,4 @@ class AppyxPresenterKeyAdapter(
 //            it.second?.let { element -> owner.updateCurrentScreen(element.key) }
 //        }
 
-}
+//}

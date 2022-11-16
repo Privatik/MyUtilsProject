@@ -48,8 +48,6 @@ class AppyxHost(
                 Timber.tag("Navigation").d(it.joinToString("::::"))
             }
             .launchIn(scope)
-
-        backStack.
     }
 
     override fun resolve(navTarget: SimpleNode, buildContext: BuildContext): Node {

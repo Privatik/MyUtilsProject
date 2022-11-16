@@ -3,18 +3,15 @@ package com.io.myutilsproject
 import android.os.Bundle
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.*
+import androidx.compose.runtime.remember
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.compose.rememberNavController
 import com.bumble.appyx.core.integrationpoint.NodeActivity
-import com.io.navigation.DefaultPresenterComponent
-import com.io.navigation.PresenterComponent
 import com.io.navigation.PresenterCompositionLocalProvider
 import com.io.navigation_common.PresenterStoreOwner
 import ru.alexgladkov.odyssey.compose.navigation.RootComposeBuilder
 
-class MainActivity: NodeActivity(),
-    PresenterComponent<NavBackStackEntry, String> by DefaultPresenterComponent() {
+class MainActivity: NodeActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,11 +38,11 @@ class MainActivity: NodeActivity(),
     }
 
     fun setOdessey(){
-        val rootController = RootComposeBuilder()
-            .apply {
-                generateGraph()
-            }
-            .build()
+//        val rootController = RootComposeBuilder()
+//            .apply {
+//                generateGraph()
+//            }
+//            .build()
 
 //        val controller = OdesseyPresenterController(rootController, presenterStoreOwner)
 //        rootController.setupWithActivity(
@@ -85,9 +82,8 @@ class MainActivity: NodeActivity(),
 
         setContent {
             val navController = rememberNavController()
-            remember {
-                GooglePresenterKeyAdapter(navController)
-                    .also { adapter -> createPresenterOwner(this, getOwner(adapter)) }
+            val owner = remember {
+                GooglePresenterOwner(GooglePresenterKeyAdapter(navController))
             }
             BackHandler(
                 onBack = {
@@ -100,16 +96,12 @@ class MainActivity: NodeActivity(),
             )
 
             PresenterCompositionLocalProvider(
-                owner = retainPresenterStoreOwner
+                owner = owner
             ) {
                 Navigation(
                     navController = navController
                 )
             }
         }
-    }
-
-    private fun getOwner(adapter: GooglePresenterKeyAdapter): PresenterStoreOwner<NavBackStackEntry, String>{
-        return GooglePresenterOwner(adapter)
     }
 }

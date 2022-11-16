@@ -11,9 +11,9 @@ import com.io.navigation_common.PresenterStoreOwner
 import kotlinx.coroutines.flow.launchIn
 
 @Composable
-fun <Guide: Any, CacheKey: Any> PresenterCompositionLocalProvider(
+fun <Guide: Any> PresenterCompositionLocalProvider(
     vararg providers: ProvidedValue<*>,
-    owner: PresenterStoreOwner<Guide, CacheKey>,
+    owner: PresenterStoreOwner<Guide>,
     canSaveStateKey: Boolean = true,
     content: @Composable () -> Unit
 ) {

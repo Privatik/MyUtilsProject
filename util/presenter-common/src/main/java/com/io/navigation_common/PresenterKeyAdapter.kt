@@ -1,8 +1,11 @@
 package com.io.navigation_common
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.onEach
+import java.util.UUID
 
-interface PresenterKeyAdapter<Guide: Any> {
-   fun getKey(): Guide
+abstract class PresenterKeyAdapter<Guide: Any> {
+   abstract fun getKey(): Guide
+
+   open fun getCacheKey(): String{
+      return UUID.randomUUID().toString()
+   }
 }
