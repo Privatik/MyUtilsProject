@@ -1,11 +1,10 @@
 package com.io.myutilsproject
 
-import android.os.Bundle
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import com.io.navigation.AndroidPresenterStoreOwner
-import com.io.navigation_common.PresenterKeyAdapter
-import java.util.*
+import com.io.navigation_common.PresenterStoreOwner
 
 //class OdesseyPresenterKeyAdapter(
 //    private var controller: RootController,
@@ -69,17 +68,33 @@ import java.util.*
 //    }
 //}
 
-class GooglePresenterKeyAdapter(
-    private val controller: NavHostController
-): PresenterKeyAdapter<NavBackStackEntry>() {
-    override fun getKey(): NavBackStackEntry = controller.currentBackStackEntry!!
+class GooglePresenterAdapter(
+    private val controller: NavHostController,
+    private val subscribeOnDestroyState:(NavBackStackEntry) -> Unit
+): PresenterStoreOwner.Adapter<NavBackStackEntry>() {
+    private val subscribedIds = hashSetOf<String>()
 
-    override fun getCacheKey(): String {
-        return getKey().id
+    override fun getGuide(): NavBackStackEntry = controller.currentBackStackEntry!!
+
+    override fun getCacheKey(currentGuide: NavBackStackEntry): String = currentGuide.let {
+        val id = it.id
+//
+//        if (!subscribedIds.contains(id)){
+//            subscribedIds.add(id)
+//            subscribeOnDestroyState(it)
+//        }
+
+        id
+    }
+
+    override fun isOptionallyVerifyValidGuide(guide: NavBackStackEntry?): Boolean {
+        if (guide == null) return true
+
+        return guide.lifecycle.currentState == Lifecycle.State.DESTROYED
     }
 
 }
 
-class GooglePresenterOwner(
-    keyAdapter: GooglePresenterKeyAdapter
+class GoogleOwnerPresenter(
+    keyAdapter: GooglePresenterAdapter
 ): AndroidPresenterStoreOwner<NavBackStackEntry>(keyAdapter)

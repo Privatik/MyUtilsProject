@@ -3,9 +3,9 @@ package com.io.navigation_common
 
 import kotlin.collections.HashMap
 
-internal class SharedPresenterStore<CacheKey: Any>() {
+internal class SharedPresenterStore<CacheKey: Any> {
     private val retainSharedPresenters = HashMap<String, CacheKey>()
-    private val sharedPresenters = HashMap<Class<out UIPresenter>, PresenterBody>()
+    private val sharedPresenters = HashMap<Class<out UIPresenter>, UIPresenter>()
     private val sharedScreenWithSharedPresenter = HashMap<CacheKey, HashSet<Class<out UIPresenter>>>()
 
     fun save(): Map<String, CacheKey> {
@@ -26,7 +26,7 @@ internal class SharedPresenterStore<CacheKey: Any>() {
         }
     }
 
-    internal fun <P: UIPresenter> createOrGetSharedPresenter(
+    internal fun <P: UIPresenter> getSharedPresenter(
         cacheKey: CacheKey,
         clazz: Class<out UIPresenter>,
         factory: PresenterFactory
@@ -47,7 +47,7 @@ internal class SharedPresenterStore<CacheKey: Any>() {
         val clazzFactory = factory::class.java
         val currentCacheKey = retainSharedPresenters.remove(presenter::class.java.name) ?: cacheKey
 
-        sharedPresenters[clazz] = PresenterBody(presenter = presenter, clazzFactory = clazzFactory)
+        sharedPresenters[clazz] = presenter
         val clazzSet = hashSetOf(clazz)
 
         sharedScreenWithSharedPresenter[currentCacheKey] = clazzSet
@@ -59,12 +59,12 @@ internal class SharedPresenterStore<CacheKey: Any>() {
     ): P{
         val sharedPresenter = sharedPresenters[clazz]!!
         @Suppress("UNCHECKED_CAST")
-        return sharedPresenter.presenter as P
+        return sharedPresenter as P
     }
 
     fun clearByCacheKey(cacheKey: CacheKey){
         sharedScreenWithSharedPresenter.remove(cacheKey)?.forEach {
-            sharedPresenters.remove(it)!!.apply { presenter.clear() }
+            sharedPresenters.remove(it)!!.clear()
         }
     }
 }

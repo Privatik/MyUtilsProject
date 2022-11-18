@@ -3,15 +3,14 @@ package com.io.navigation
 import android.os.Bundle
 import androidx.core.os.bundleOf
 import com.io.navigation.Constants.RETAIN_PRESENTER_LIST
-import com.io.navigation_common.PresenterKeyAdapter
 import com.io.navigation_common.PresenterStoreOwner
 
 open class AndroidPresenterStoreOwner<Guide: Any>(
-    keyAdapter: PresenterKeyAdapter<Guide>
+    keyAdapter: PresenterStoreOwner.Adapter<Guide>
 ): PresenterStoreOwner<Guide>(keyAdapter) {
 
     open fun saveState(): Bundle? {
-        val sharedPresenters = restorePresenterStoreOwner.saveSharedPresenters()
+        val sharedPresenters = restorePresenterStore.saveSharedPresenters()
 
         val bundle = bundleOf(
             *sharedPresenters
@@ -33,7 +32,7 @@ open class AndroidPresenterStoreOwner<Guide: Any>(
             }
         }
 
-        restorePresenterStoreOwner.restoreSharedPresenters(retain)
+        restorePresenterStore.restoreSharedPresenters(retain)
     }
 
 }

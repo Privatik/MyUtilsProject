@@ -1,15 +1,13 @@
 package com.io.myutilsproject
 
 import android.os.Bundle
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.remember
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.compose.rememberNavController
+import com.bumble.appyx.core.integration.NodeHost
 import com.bumble.appyx.core.integrationpoint.NodeActivity
+import com.bumble.appyx.navmodel.backstack.BackStack
 import com.io.navigation.PresenterCompositionLocalProvider
-import com.io.navigation_common.PresenterStoreOwner
-import ru.alexgladkov.odyssey.compose.navigation.RootComposeBuilder
 
 class MainActivity: NodeActivity() {
 
@@ -17,24 +15,17 @@ class MainActivity: NodeActivity() {
         super.onCreate(savedInstanceState)
 
 //        setOdessey()
-        setGoogle()
-//        setAppyx()
+//        setGoogle()
+        setAppyx()
     }
 
     private fun setAppyx() {
-//        onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
-//            override fun handleOnBackPressed() {
-//
-//            }
-//        })
-//
-//        setContent {
-//            PresenterCompositionLocalProvider<String>(){
-//                NodeHost(integrationPoint = appyxIntegrationPoint) {
-//                    AppyxHost(it, lifecycleScope)
-//                }
-//            }
-//        }
+
+        setContent {
+            NodeHost(integrationPoint = appyxIntegrationPoint) { buildContext ->
+                AppyxHost(buildContext = buildContext)
+            }
+        }
     }
 
     fun setOdessey(){
@@ -83,23 +74,22 @@ class MainActivity: NodeActivity() {
         setContent {
             val navController = rememberNavController()
             val owner = remember {
-                GooglePresenterOwner(GooglePresenterKeyAdapter(navController))
+                GoogleOwnerPresenter(
+                    GooglePresenterAdapter(
+                        controller = navController,
+                        subscribeOnDestroyState = {
+
+                        }
+                    )
+                )
             }
-            BackHandler(
-                onBack = {
-                    if (navController.backQueue.size <= 2){
-                        finish()
-                    } else {
-                        navController.popBackStack()
-                    }
-                }
-            )
 
             PresenterCompositionLocalProvider(
                 owner = owner
             ) {
                 Navigation(
-                    navController = navController
+                    navController = navController,
+                    owner
                 )
             }
         }

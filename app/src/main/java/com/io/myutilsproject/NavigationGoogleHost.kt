@@ -1,8 +1,11 @@
 package com.io.myutilsproject
 
-import androidx.compose.material.SnackbarDuration
-import androidx.compose.material.SnackbarHostState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -12,27 +15,52 @@ import com.io.myutilsproject.screens.fouth.FourthScreen
 import com.io.myutilsproject.screens.second.SecondEffect
 import com.io.myutilsproject.screens.second.SecondPresenter
 import com.io.myutilsproject.screens.second.SecondScreen
-import com.io.myutilsproject.screens.second.SecondState
-import com.io.myutilsproject.screens.sixth.SixthPresenter
 import com.io.myutilsproject.screens.third.ThirdPresenter
-import com.io.myutilsproject.screens.third.ThirdState
 import com.io.myutilsproject.screens.third.TripleScreen
 import com.io.navigation.presenter
 import com.io.navigation.sharedPresenter
+import com.io.navigation_common.PresenterStoreOwner
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
+class NavBackLifecycleObserver<Guide: Any>(
+    private val lifecycle: Lifecycle,
+    private val presenterStoreOwner: PresenterStoreOwner<Guide>
+): DefaultLifecycleObserver{
+
+    override fun onDestroy(owner: LifecycleOwner) {
+        presenterStoreOwner.forcedCleanGarbage()
+        lifecycle.removeObserver(this)
+        super.onDestroy(owner)
+    }
+}
+
 @Composable
-fun Navigation(
+fun <Guide: Any> Navigation(
     navController: NavHostController,
+    presenterStoreOwner: PresenterStoreOwner<Guide>
 ){
+    LaunchedEffect(null){
+        navController.currentBackStackEntryFlow
+            .onEach {
+                it.lifecycle.addObserver(
+                    NavBackLifecycleObserver(
+                        lifecycle = it.lifecycle,
+                        presenterStoreOwner = presenterStoreOwner
+                    )
+                )
+            }
+            .launchIn(this)
+    }
+
+
     NavHost(
         navController = navController,
         startDestination = Screens.FirstScreen.route){
 
         composable(Screens.FirstScreen.route){
             println("Presenter create first screen")
-//            val appScopePresenter: SharedAppComponentPresenter = sharedPresenter()
+            val appScopePresenter: SharedAppComponentPresenter = sharedPresenter()
             FirstScreen{
                 navController.navigate(Screens.SecondScreen.route)
             }
@@ -40,37 +68,28 @@ fun Navigation(
 
         composable(Screens.SecondScreen.route){
             println("Presenter create second screen")
-//            val appScopePresenter: SharedAppComponentPresenter = sharedPresenter()
-//            val secondPresenter: SecondPresenter = presenter(appScopePresenter.factory)
-//            val fifthPresenter: FifthPresenter = sharedPresenter()
-//            val snackbarHostState = remember {
-//                SnackbarHostState()
-//            }
-//
-//            LaunchedEffect(Unit){
-//                secondPresenter
-//                    .singleEffect
-//                    .onEach {
-//                        when (it){
-//                            is SecondEffect.Snack -> {
-//                                println("Machine show toast with ${it.message}")
-//                            }
-//                        }
-//                    }
-//                    .launchIn(this)
-//            }
+            val appScopePresenter: SharedAppComponentPresenter = sharedPresenter()
+            val secondPresenter: SecondPresenter = presenter(appScopePresenter.factory)
+            val fifthPresenter: FifthPresenter = sharedPresenter()
 
-            val secondState = remember {
-                mutableStateOf(SecondState(godCount = 0))
+            LaunchedEffect(Unit){
+                secondPresenter
+                    .singleEffect
+                    .onEach {
+                        when (it){
+                            is SecondEffect.Snack -> {
+                                println("Machine show toast with ${it.message}")
+                            }
+                        }
+                    }
+                    .launchIn(this)
             }
-            val fifthState = remember {
-                mutableStateOf(ThirdState())
-            }
+
             SecondScreen(
-                body =  secondState,
-                bodyT = fifthState,
-                inc = {  },
-                incGod = { },
+                body =  secondPresenter.state.collectAsState(),
+                bodyT = fifthPresenter.state.collectAsState(),
+                inc = { secondPresenter.inc(it + 1) },
+                incGod = { fifthPresenter.inc(it + 1) },
                 open = {
                     navController.navigate(Screens.ThirdScreen.route)
                 },
@@ -82,20 +101,14 @@ fun Navigation(
         }
 
         composable(Screens.ThirdScreen.route){
-//            val nextScopePresenter: SharedNextComponentPresenter = sharedPresenter()
-//            val thirdPresenter: ThirdPresenter = presenter(nextScopePresenter.factory)
-//            val sixthPresenter: SixthPresenter = sharedPresenter()
+            val nextScopePresenter: SharedNextComponentPresenter = sharedPresenter()
+            val thirdPresenter: ThirdPresenter = presenter(nextScopePresenter.factory)
+            val fifthPresenter: FifthPresenter = sharedPresenter()
 
-            val sixthState = remember {
-                mutableStateOf(ThirdState())
-            }
-            val thirdState = remember {
-                mutableStateOf(ThirdState())
-            }
             TripleScreen(
-                state = thirdState,
-                stateT = sixthState,
-                inc = {  },
+                state = thirdPresenter.state.collectAsState(),
+                stateT = fifthPresenter.state.collectAsState(),
+                inc = { fifthPresenter.inc(it + 1) },
                 backToFirst = {
                     navController.popBackStack(Screens.FirstScreen.route, false)
                 },

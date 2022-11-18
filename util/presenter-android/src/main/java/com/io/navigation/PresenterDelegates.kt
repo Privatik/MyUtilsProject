@@ -1,7 +1,6 @@
 package com.io.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.saveable.rememberSaveable
 import com.io.navigation_common.PresenterFactory
 import com.io.navigation_common.UIPresenter
@@ -36,7 +35,7 @@ public fun <P : UIPresenter> presenter(
             isShared = isShared
         )
     ) {
-        owner.createPresenter<P>(
+        owner.cleanGarbageIntoStoreAndCreatePresenter<P>(
             clazz = clazz,
             factory = factory,
             isShared = isShared

@@ -11,6 +11,8 @@ import com.bumble.appyx.core.BuildConfig
 import com.bumble.appyx.core.modality.BuildContext
 import com.bumble.appyx.core.node.Node
 import com.bumble.appyx.core.node.ParentNode
+import com.io.myutilsproject.SharedAppComponentPresenter
+import com.io.navigation.sharedPresenter
 
 @Composable
 fun FirstScreen(
@@ -33,6 +35,12 @@ class FirstNode(
 
     @Composable
     override fun View(modifier: Modifier) {
+        val appScopePresenter: SharedAppComponentPresenter = sharedPresenter()
+       Content()
+    }
+
+    @Composable
+    private fun Content(){
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
