@@ -18,7 +18,6 @@ open class PresenterStoreOwner<Guide: Any>(
         factory: PresenterFactory,
         isShared: Boolean = false
     ): P {
-        println("Navigation cleanGarbageIntoStoreAndCreatePresenter")
         removeUnnecessaryPresenters()
         val referenceOnPresenter = getAndSaveCurrentReferenceOnPresenterItem()
         return createPresenter(
@@ -35,7 +34,7 @@ open class PresenterStoreOwner<Guide: Any>(
         factory: PresenterFactory,
         isShared: Boolean = false
     ): P {
-        println("Navigation createPresenter")
+        println("Navigation createPresenter $clazz by key $cacheKey")
         return if (isShared){
             sharedPresenterStore.getSharedPresenter<P>(cacheKey, clazz, factory)
         } else {
@@ -46,13 +45,15 @@ open class PresenterStoreOwner<Guide: Any>(
 
     fun forcedCleanGarbage() = removeUnnecessaryPresenters()
 
-    @Synchronized
     private fun removeUnnecessaryPresenters(){
         referenceOnPresenters
             .filter {
-                !it.checkOnExitsReferent() || adapter.isOptionallyVerifyValidGuide(it.getGuide())
+                !it.checkOnExitsReferent() || !adapter.isOptionallyVerifyValidGuide(it.getGuide())
             }
-            .onEach { removeUnnecessaryPresentersByKey(it.cacheKey) }
+            .onEach {
+                println("Navigation remove element by ${it.cacheKey}")
+                removeUnnecessaryPresentersByKey(it.cacheKey)
+            }
             .forEach(referenceOnPresenters::remove)
     }
 
@@ -88,7 +89,7 @@ open class PresenterStoreOwner<Guide: Any>(
     abstract class Adapter<Guide: Any> {
         abstract fun getGuide(): Guide
         abstract fun getCacheKey(currentGuide: Guide): String
-        open fun isOptionallyVerifyValidGuide(guide: Guide?): Boolean = false
+        open fun isOptionallyVerifyValidGuide(guide: Guide?): Boolean = true
     }
 
 }

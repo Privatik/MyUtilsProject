@@ -88,9 +88,9 @@ class GooglePresenterAdapter(
     }
 
     override fun isOptionallyVerifyValidGuide(guide: NavBackStackEntry?): Boolean {
-        if (guide == null) return true
+        if (guide == null) return false
 
-        return guide.lifecycle.currentState == Lifecycle.State.DESTROYED
+        return guide.lifecycle.currentState != Lifecycle.State.DESTROYED
     }
 
 }
