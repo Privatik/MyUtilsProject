@@ -3,34 +3,30 @@ package com.example.machine
 import kotlinx.coroutines.flow.*
 
 fun <S: Any, E: Any> reducer(
-    initState: S,
-    inItAction: suspend () -> Unit = {},
+    defaultState: S,
     buildReducerDSL: ReducerDSL<S, E>.() -> Unit
-): Machine<S, E>{
-    val initStep = Step<S, E>(initState, null)
-
+): Reducer<S, E>{
     val dsl = ReducerDSL<S, E>().apply(buildReducerDSL)
+    val initStep = Step<S, E>(defaultState, null)
 
-    return object : Machine<S, E>{
+    return object : Reducer<S, E>{
         private val _effects = MutableSharedFlow<E>()
         override val effects: Flow<E> = _effects
 
         override val state: Flow<S>
             get() {
                 return dsl.transactions
-                    .map { it.everyFlow.map { payload -> Body(payload, it) } }
+                    .map { it.flow.map { payload -> Body(payload, it) } }
                     .merge()
                     .scan(initStep){ oldStep, body ->
-                        val newState = body.transaction.render.get(oldStep.state, body.payload)
+                        val newState = body.transaction.changeState.get(oldStep.state, body.payload)
                         val effect: E? = body.transaction.get(oldStep.state, newState, body.payload)
                         Step(newState, effect)
                     }.transform<Step<S, E>, S> {
                         emit(it.state)
                         it.effect?.run { _effects.emit(this) }
                     }
-                    .onStart{
-                        inItAction()
-                    }
+                    .onStart{ dsl.defaultAction() }
             }
     }
 }
@@ -45,7 +41,9 @@ internal data class Body<S: Any, P : Any>(
     val transaction: Transaction<S, out Any>
 )
 
-interface Machine<S: Any, E: Any>{
+interface Reducer<S: Any, E: Any>{
+
+
     val state: Flow<S>
     val effects: Flow<E>
 }

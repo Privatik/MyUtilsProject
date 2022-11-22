@@ -23,36 +23,11 @@ import com.io.navigation_common.PresenterStoreOwner
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-class NavBackLifecycleObserver<Guide: Any>(
-    private val lifecycle: Lifecycle,
-    private val presenterStoreOwner: PresenterStoreOwner<Guide>
-): DefaultLifecycleObserver{
-
-    override fun onDestroy(owner: LifecycleOwner) {
-        presenterStoreOwner.forcedCleanGarbage()
-        lifecycle.removeObserver(this)
-        super.onDestroy(owner)
-    }
-}
-
 @Composable
 fun <Guide: Any> Navigation(
     navController: NavHostController,
     presenterStoreOwner: PresenterStoreOwner<Guide>
 ){
-    LaunchedEffect(null){
-        navController.currentBackStackEntryFlow
-            .onEach {
-                it.lifecycle.addObserver(
-                    NavBackLifecycleObserver(
-                        lifecycle = it.lifecycle,
-                        presenterStoreOwner = presenterStoreOwner
-                    )
-                )
-            }
-            .launchIn(this)
-    }
-
 
     NavHost(
         navController = navController,

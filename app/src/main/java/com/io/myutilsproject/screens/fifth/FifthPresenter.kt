@@ -5,7 +5,7 @@ import com.io.myutilsproject.Presenter
 import com.io.myutilsproject.screens.third.ThirdState
 import kotlinx.coroutines.launch
 
-class FifthPresenter: Presenter<ThirdState, Any, Any>(ThirdState() to {}) {
+class FifthPresenter: Presenter<ThirdState, Any, Any>(ThirdState()) {
 
     fun inc(count: Int){
         presenterScope.launch {
@@ -15,8 +15,8 @@ class FifthPresenter: Presenter<ThirdState, Any, Any>(ThirdState() to {}) {
 
     override fun ReducerDSL<ThirdState, Any>.reducer() {
         onEach(
-            everyFlow = saveHandle.handleAsFlow<Int>("inc"),
-            updateState = { oldState, payload -> oldState.copy(count = payload) }
+            flow = saveHandle.handleAsFlow<Int>("inc"),
+            changeState = { oldState, payload -> oldState.copy(count = payload) }
         )
     }
 }

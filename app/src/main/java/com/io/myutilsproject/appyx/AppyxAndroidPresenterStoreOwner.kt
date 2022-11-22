@@ -13,7 +13,6 @@ class AppyxPresenterAdapter(
 
     override fun getGuide(): NavKey<SimpleNode> {
         val el = backStack.active!!
-        println("Navigation $el its id = ${el.key.id}")
         return el.key
     }
 

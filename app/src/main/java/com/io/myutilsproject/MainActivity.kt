@@ -14,60 +14,18 @@ class MainActivity: NodeActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-//        setOdessey()
-//        setGoogle()
-        setAppyx()
+        setGoogle()
+//        setAppyx()
     }
 
-    private fun setAppyx() {
-
-        setContent {
-            NodeHost(integrationPoint = appyxIntegrationPoint) { buildContext ->
-                AppyxHost(buildContext = buildContext)
-            }
-        }
-    }
-
-    fun setOdessey(){
-//        val rootController = RootComposeBuilder()
-//            .apply {
-//                generateGraph()
-//            }
-//            .build()
-
-//        val controller = OdesseyPresenterController(rootController, presenterStoreOwner)
-//        rootController.setupWithActivity(
-//            this,
-//            controller
-//        )
+//    private fun setAppyx() {
 //
-//        setContentWithPresenter(
-//            LocalRootController provides rootController,
-//            controller = controller,
-//            canUpdate = false
-//        ) {
-//            var flag by remember { mutableStateOf(UUID.randomUUID()) }
-//            LaunchedEffect(flag){
-//                controller
-//                    .updateScreen()
-//                    .launchIn(this)
-//
-//                merge(
-//                    controller.updateControllerFlow  ,
-//                    controller.updateParentControllerFlow
-//                )
-//                    .onEach {
-//                        flag = UUID.randomUUID()
-//                    }
-//                    .launchIn(this)
-//
-//            }
-//
-//            ModalNavigator {
-//                Navigator(Screens.FirstScreen.route)
+//        setContent {
+//            NodeHost(integrationPoint = appyxIntegrationPoint) { buildContext ->
+//                AppyxHost(buildContext = buildContext)
 //            }
 //        }
-    }
+//    }
 
     fun setGoogle(){
 
@@ -76,10 +34,7 @@ class MainActivity: NodeActivity() {
             val owner = remember {
                 GoogleOwnerPresenter(
                     GooglePresenterAdapter(
-                        controller = navController,
-                        subscribeOnDestroyState = {
-
-                        }
+                        controller = navController
                     )
                 )
             }

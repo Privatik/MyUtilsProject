@@ -2,34 +2,37 @@ package com.example.machine
 
 import kotlinx.coroutines.flow.Flow
 import java.util.*
+import kotlin.properties.Delegates
 
-internal typealias RenderState<S, P> = (oldState: S, payload: P) -> S
-internal typealias DoAction<S, P> = suspend (oldState: S, newState: S, payload: P) -> Unit
-internal typealias GetEffect<S, P, E> = suspend (oldState: S, newState: S, payload: P) -> E?
+internal typealias ChangeStateFunc<S, P> = (oldState: S, payload: P) -> S
+internal typealias DoActionFunc<S, P> = suspend (oldState: S, newState: S, payload: P) -> Unit
+internal typealias GetEffectFromActionFunc<S, P, E> = suspend (oldState: S, newState: S, payload: P) -> E?
 
 class ReducerDSL<S: Any, E: Any> internal constructor(){
+    var defaultAction: suspend () -> Unit = {}
+
     internal val transactions = LinkedList<Transaction<S, out Any>>()
 
     fun <P: Any> onEach(
-        everyFlow: Flow<P>,
-        updateState: RenderState<S, P>,
+        flow: Flow<P>,
+        changeState: ChangeStateFunc<S, P>,
     ){
         onEach(
-            everyFlow = everyFlow,
-            updateState = updateState,
-            action = null
+            flow = flow,
+            changeState = changeState,
+            action = { _, _, _ -> }
         )
     }
 
     @JvmName("onEachAction")
     fun <P: Any> onEach(
-        everyFlow: Flow<P>,
-        updateState: RenderState<S, P>? = null,
-        action: DoAction<S, P>? = null
+        flow: Flow<P>,
+        changeState: ChangeStateFunc<S, P>? = null,
+        action: DoActionFunc<S, P>? = null
     ){
-        val transaction = TransactionAction(
-            everyFlow,
-            updateState,
+        val transaction = TransactionWithAction(
+            flow,
+            changeState,
             action
         )
         transactions.add(transaction)
@@ -37,13 +40,13 @@ class ReducerDSL<S: Any, E: Any> internal constructor(){
 
     @JvmName("onEachEffect")
     fun <P: Any> onEach(
-        everyFlow: Flow<P>,
-        updateState: RenderState<S, P>? = null,
-        effect: GetEffect<S, P, E>? = null
+        flow: Flow<P>,
+        changeState: ChangeStateFunc<S, P>? = null,
+        effect: GetEffectFromActionFunc<S, P, E>? = null
     ){
-        val transaction = TransactionGetEffect(
-            everyFlow,
-            updateState,
+        val transaction = TransactionWithEffect(
+            flow,
+            changeState,
             effect
         )
         transactions.add(transaction)

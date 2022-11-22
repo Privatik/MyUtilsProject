@@ -22,7 +22,7 @@ class SecondPresenter @Inject constructor(
     private val firstRepository: FirstRepository,
     private val secondRepository: SecondRepository,
 ): Presenter<SecondState, Any, SecondEffect>(
-    Pair(SecondState(godCount = firstRepository.staterInc)) {}
+    SecondState(godCount = firstRepository.staterInc)
 ) {
 
 //    private val inc = saveHandle.handleAsFlow<Int>("inc")
@@ -42,8 +42,8 @@ class SecondPresenter @Inject constructor(
 
     override fun ReducerDSL<SecondState, SecondEffect>.reducer() {
         onEach(
-            everyFlow = saveHandle.handleAsFlow<Int>("inc"),
-            updateState = { oldState, payload ->
+            flow = saveHandle.handleAsFlow<Int>("inc"),
+            changeState = { oldState, payload ->
                 oldState.copy(count = payload)
             },
             effect = { _, _, payload ->
@@ -53,15 +53,15 @@ class SecondPresenter @Inject constructor(
         )
 
         onEach(
-            everyFlow = incGod,
+            flow = incGod,
             action = { _, _, payload ->
                 firstRepository.inc(payload)
             }
         )
 
         onEach(
-            everyFlow = firstRepository.incFlow,
-            updateState = { oldState, payload ->
+            flow = firstRepository.incFlow,
+            changeState = { oldState, payload ->
                 oldState.copy(godCount = payload)
             }
         )

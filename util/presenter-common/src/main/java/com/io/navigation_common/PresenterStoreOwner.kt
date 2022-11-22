@@ -1,9 +1,11 @@
 package com.io.navigation_common
 
+import java.util.Collections
+
 open class PresenterStoreOwner<Guide: Any>(
     private val adapter: PresenterStoreOwner.Adapter<Guide>
 ){
-    private val referenceOnPresenters = hashSetOf<ReferenceOnPresenter<Guide>>()
+    private val referenceOnPresenters = HashSet<ReferenceOnPresenter<Guide>>()
 
     private val sharedPresenterStore = SharedPresenterStore<String>()
     private val simpleStores = HashMap<String, SimplePresenterStore>()
@@ -34,7 +36,6 @@ open class PresenterStoreOwner<Guide: Any>(
         factory: PresenterFactory,
         isShared: Boolean = false
     ): P {
-        println("Navigation createPresenter $clazz by key $cacheKey")
         return if (isShared){
             sharedPresenterStore.getSharedPresenter<P>(cacheKey, clazz, factory)
         } else {
@@ -43,17 +44,12 @@ open class PresenterStoreOwner<Guide: Any>(
         }
     }
 
-    fun forcedCleanGarbage() = removeUnnecessaryPresenters()
-
     private fun removeUnnecessaryPresenters(){
         referenceOnPresenters
             .filter {
                 !it.checkOnExitsReferent() || !adapter.isOptionallyVerifyValidGuide(it.getGuide())
             }
-            .onEach {
-                println("Navigation remove element by ${it.cacheKey}")
-                removeUnnecessaryPresentersByKey(it.cacheKey)
-            }
+            .onEach { removeUnnecessaryPresentersByKey(it.cacheKey) }
             .forEach(referenceOnPresenters::remove)
     }
 

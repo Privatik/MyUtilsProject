@@ -3,18 +3,18 @@ package com.example.machine
 import kotlinx.coroutines.flow.Flow
 
 internal interface Transaction<S: Any, P: Any> {
-    val everyFlow: Flow<P>
-    val render: RenderState<S,P>?
+    val flow: Flow<P>
+    val changeState: ChangeStateFunc<S,P>?
 }
 
-internal data class TransactionAction<S: Any, P: Any>(
-    override val everyFlow: Flow<P>,
-    override val render: RenderState<S,P>? = null,
-    internal var actionBody: DoAction<S,P>? = null
+internal data class TransactionWithAction<S: Any, P: Any>(
+    override val flow: Flow<P>,
+    override val changeState: ChangeStateFunc<S,P>? = null,
+    internal var action: DoActionFunc<S,P>? = null
 ): Transaction<S, P>
 
-internal data class TransactionGetEffect<S: Any, P: Any, E: Any>(
-    override val everyFlow: Flow<P>,
-    override val render: RenderState<S,P>? = null,
-    internal val effectBody: GetEffect<S,P,E>? = null
+internal data class TransactionWithEffect<S: Any, P: Any, E: Any>(
+    override val flow: Flow<P>,
+    override val changeState: ChangeStateFunc<S,P>? = null,
+    internal val effect: GetEffectFromActionFunc<S,P,E>? = null
 ): Transaction<S,P>

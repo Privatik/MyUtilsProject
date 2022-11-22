@@ -4,17 +4,18 @@ import com.example.machine.ReducerDSL
 import com.example.machine.reducer
 import com.io.navigation.AndroidPresenter
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 
 abstract class Presenter<S: Any, I: Any, E: Any>(
-    initBody: Pair<S, suspend () -> Unit>
-) : AndroidPresenter() {
+    defaultState: S
+): AndroidPresenter() {
 
     val presenterScope: CoroutineScope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
 
-    private val _state = MutableStateFlow<S>(initBody.first)
-    val state: StateFlow<S> by lazy(LazyThreadSafetyMode.NONE) {
-        build(initBody)
+    private val _state = MutableStateFlow<S>(defaultState)
+    val state: StateFlow<S> by lazy(LazyThreadSafetyMode.NONE){
+        build()
         _state.asStateFlow()
     }
 
@@ -23,8 +24,8 @@ abstract class Presenter<S: Any, I: Any, E: Any>(
 
     protected abstract fun ReducerDSL<S, E>.reducer()
 
-    private fun build(initBody: Pair<S, suspend () -> Unit>){
-        reducer<S, E>(initBody.first, initBody.second){ reducer() }.apply {
+    private fun build(){
+        reducer<S, E>(defaultState = _state.value) { reducer() }.apply {
             state
                 .onEach {
                     _state.emit(it)

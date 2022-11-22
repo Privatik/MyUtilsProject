@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 class FirstPresenter @Inject constructor(
     private val secondRepository: SecondRepository,
-): Presenter<Any, Any, Any>(Pair(Any()) {}) {
+): Presenter<Any, Any, Any>(Any()) {
 
     override fun ReducerDSL<Any, Any>.reducer() {
 

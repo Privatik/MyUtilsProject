@@ -3,7 +3,6 @@ package com.io.myutilsproject.screens.third
 import androidx.compose.runtime.Stable
 import com.example.machine.ReducerDSL
 import com.io.myutilsproject.Presenter
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -12,7 +11,7 @@ data class ThirdState(
     val count: Int = 0
 )
 
-class ThirdPresenter @Inject constructor(): Presenter<ThirdState, Any, Any>(Pair(ThirdState()) {}) {
+class ThirdPresenter @Inject constructor(): Presenter<ThirdState, Any, Any>(ThirdState()) {
 
     private val inc = saveHandle.handleAsFlow<Int>("inc")
 
@@ -24,8 +23,8 @@ class ThirdPresenter @Inject constructor(): Presenter<ThirdState, Any, Any>(Pair
 
     override fun ReducerDSL<ThirdState, Any>.reducer() {
         onEach(
-            everyFlow = inc,
-            updateState = { oldState, payload -> oldState.copy(count = payload) }
+            flow = inc,
+            changeState = { oldState, payload -> oldState.copy(count = payload) }
         )
     }
 
